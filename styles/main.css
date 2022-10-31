@@ -1,0 +1,35 @@
+#container{
+	position:absolute;
+	width:960px;
+	height:640px;
+	border:2px solid #000000;
+	perspective:600px;
+	overflow:hidden;
+    background-color: #0C0F0A;
+    border: 5px solid #0AD688;
+}
+#world{
+	position:absolute;
+	width:inherit;
+	height:inherit;
+	transform-style:preserve-3d;
+}
+.wall{
+	position:absolute;
+    border: 5px solid #0AD688;
+    box-shadow: inset 0px 0px 10px rgba(53,245,171,0.9);
+}
+.floor{
+	position:absolute;
+    border: 5px solid #456990;
+    box-shadow: inset 0px 0px 10px rgba(153,204,204,0.9);
+}
+#pawn{
+	display:none;
+	position:absolute;
+	top:400px;
+	left:600px;
+	transform:translate(-50%,-50%);
+	width:100px;
+	height:100px;
+}
