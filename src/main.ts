@@ -8,6 +8,7 @@ import { MissionScene } from './scenes/MissionScene';
 import { ResultsScene } from './scenes/ResultsScene';
 import { PauseOverlay } from './scenes/PauseOverlay';
 import { MissionSelectScene } from './scenes/MissionSelectScene';
+import { ShopScene } from './scenes/ShopScene';
 import { audioService, bindPhaserMute } from './audio/AudioService';
 import { initPlatform, onPlatformPause, onPlatformResume } from './platform/yandex';
 import { saveService } from './save/SaveService';
@@ -51,6 +52,7 @@ async function bootstrap(): Promise<void> {
       ResultsScene,
       PauseOverlay,
       MissionSelectScene,
+      ShopScene,
     ],
   });
 

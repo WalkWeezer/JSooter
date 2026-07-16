@@ -16,7 +16,7 @@
     "status": "язык: {{lang}} | sdk: {{sdk}}",
     "cta_hum": "НАЖМИ — ЗВУК",
     "cta_ready": "ГОТОВО",
-    "phase_note": "Фаза 4: 14 миссий\nПрогресс сохраняется\nВыбери контракт в списке",
+    "phase_note": "Фаза 5: личины и магазин\nСюжет не за пейволлом",
     "open_settings": "Настройки",
     "open_missions": "Миссии",
     "sticky_label": "зона sticky-баннера"
@@ -70,7 +70,8 @@
     "buy": "Купить",
     "owned": "Куплено",
     "remove_ads": "Отключить interstitial",
-    "pack_cassettes": "Набор кассет"
+    "pack_cassettes": "Набор кассет",
+    "equip": "Надеть"
   },
   "settings": {
     "title": "Настройки",
@@ -100,5 +101,13 @@
     "price": "{{price}}",
     "purchase": "Купить",
     "restore": "Восстановить"
+  },
+  "masks": {
+    "iskra_name": "Искра",
+    "iskra_desc": "Чуть быстрее движение",
+    "glushitel_name": "Глушитель",
+    "glushitel_desc": "Первый выстрел за миссию тише",
+    "cassette_name": "Кассета",
+    "cassette_desc": "Конусы зрения читаются лучше"
   }
 }

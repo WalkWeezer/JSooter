@@ -3,6 +3,7 @@ import { t } from '../i18n';
 import type { MissionResultPayload } from './MissionScene';
 import { saveService } from '../save/SaveService';
 import { getNextMissionId } from '../data/missionIndex';
+import { adsService } from '../ads/AdsService';
 
 export class ResultsScene extends Phaser.Scene {
   private payload!: MissionResultPayload;
@@ -15,13 +16,14 @@ export class ResultsScene extends Phaser.Scene {
     this.payload = data;
   }
 
-  create(): void {
+  async create(): Promise<void> {
     const { width, height } = this.scale;
     const pad = Number(this.registry.get('stickyPaddingPx') || 90);
     const p = this.payload;
     const nextId = getNextMissionId(p.missionId);
 
     saveService.markCleared(p.missionId, p.rank, p.timeSec, p.deaths, nextId);
+    await adsService.showSticky();
 
     this.cameras.main.setBackgroundColor('#0B0D12');
 
@@ -34,7 +36,7 @@ export class ResultsScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height * 0.3, t('results.rank', { rank: p.rank }), {
+      .text(width / 2, height * 0.26, t('results.rank', { rank: p.rank }), {
         fontFamily: 'monospace',
         fontSize: '48px',
         color: p.rank.startsWith('S') ? '#39FF14' : '#FF2A6D',
@@ -44,7 +46,7 @@ export class ResultsScene extends Phaser.Scene {
     this.add
       .text(
         width / 2,
-        height * 0.44,
+        height * 0.4,
         `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}\n${t('shop.impulses', { count: saveService.get().impulses })}`,
         {
           fontFamily: 'monospace',
@@ -55,9 +57,36 @@ export class ResultsScene extends Phaser.Scene {
       )
       .setOrigin(0.5);
 
+    const rv = this.add
+      .text(width / 2, height * 0.54, t('ads.reward_x2'), {
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        color: '#0B0D12',
+        backgroundColor: '#FFC857',
+        padding: { x: 12, y: 8 },
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    rv.on('pointerdown', async () => {
+      rv.disableInteractive();
+      const ok = await adsService.showRewarded();
+      if (ok) {
+        saveService.addImpulses(10);
+        rv.setText(t('shop.impulses', { count: saveService.get().impulses }));
+      } else {
+        rv.setInteractive({ useHandCursor: true });
+      }
+    });
+
+    const goNext = async (target: () => void) => {
+      await adsService.showInterstitial();
+      target();
+    };
+
     if (nextId) {
       const next = this.add
-        .text(width / 2, height * 0.6, t('results.next'), {
+        .text(width / 2, height * 0.64, t('results.next'), {
           fontFamily: 'monospace',
           fontSize: '18px',
           color: '#0B0D12',
@@ -66,11 +95,13 @@ export class ResultsScene extends Phaser.Scene {
         })
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
-      next.on('pointerdown', () => this.scene.start('BriefingScene', { missionId: nextId }));
+      next.on('pointerdown', () => {
+        void goNext(() => this.scene.start('BriefingScene', { missionId: nextId }));
+      });
     }
 
     const again = this.add
-      .text(width / 2, height * 0.7, t('mission.retry'), {
+      .text(width / 2, height * 0.74, t('mission.retry'), {
         fontFamily: 'monospace',
         fontSize: '16px',
         color: '#0B0D12',
@@ -81,12 +112,14 @@ export class ResultsScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     again.on('pointerdown', () => {
-      this.registry.set('runDeaths', 0);
-      this.scene.start('BriefingScene', { missionId: p.missionId });
+      void goNext(() => {
+        this.registry.set('runDeaths', 0);
+        this.scene.start('BriefingScene', { missionId: p.missionId });
+      });
     });
 
     const hub = this.add
-      .text(width / 2, height * 0.8, t('results.to_hub'), {
+      .text(width / 2, height * 0.84, t('results.to_hub'), {
         fontFamily: 'monospace',
         fontSize: '16px',
         color: '#2DE2E6',
@@ -96,6 +129,8 @@ export class ResultsScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    hub.on('pointerdown', () => this.scene.start('HubScene'));
+    hub.on('pointerdown', () => {
+      void goNext(() => this.scene.start('HubScene'));
+    });
   }
 }

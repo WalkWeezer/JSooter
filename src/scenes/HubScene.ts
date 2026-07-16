@@ -103,7 +103,7 @@ export class HubScene extends Phaser.Scene {
     settings.on('pointerdown', () => this.scene.start('SettingsScene'));
 
     const missions = this.add
-      .text(width / 2, height * 0.72, t('hub.open_missions'), {
+      .text(width / 2, height * 0.68, t('hub.open_missions'), {
         fontFamily: 'monospace',
         fontSize: '18px',
         color: '#0B0D12',
@@ -117,10 +117,22 @@ export class HubScene extends Phaser.Scene {
       this.scene.start('MissionSelectScene');
     });
 
-    this.add
-      .text(width / 2, height * 0.84, t('hub.phase_note'), {
+    const shop = this.add
+      .text(width / 2, height * 0.78, t('shop.title'), {
         fontFamily: 'monospace',
-        fontSize: '13px',
+        fontSize: '16px',
+        color: '#2DE2E6',
+        backgroundColor: '#121820',
+        padding: { x: 12, y: 7 },
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    shop.on('pointerdown', () => this.scene.start('ShopScene'));
+
+    this.add
+      .text(width / 2, height * 0.88, t('hub.phase_note'), {
+        fontFamily: 'monospace',
+        fontSize: '12px',
         color: '#6b7385',
         align: 'center',
       })

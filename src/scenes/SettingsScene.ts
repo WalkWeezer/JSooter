@@ -53,6 +53,20 @@ export class SettingsScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    const cloud = this.add
+      .text(width / 2, pad + 290, t('settings.cloud_save'), {
+        fontFamily: 'monospace',
+        fontSize: '16px',
+        color: '#0B0D12',
+        backgroundColor: '#2DE2E6',
+        padding: { x: 14, y: 8 },
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    cloud.on('pointerdown', () => {
+      console.info('[auth] cloud save requested — open Yandex auth on explicit tap');
+    });
+
     const back = this.add
       .text(width / 2, height - pad - 40, t('common.back'), {
         fontFamily: 'monospace',

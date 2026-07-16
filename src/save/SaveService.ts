@@ -5,6 +5,7 @@ export type SaveData = {
   impulses: number;
   cassettes: number;
   maskId: string;
+  unlockedMasks: string[];
   removeAds: boolean;
 };
 
@@ -17,6 +18,7 @@ const DEFAULT: SaveData = {
   impulses: 0,
   cassettes: 0,
   maskId: 'iskra',
+  unlockedMasks: ['iskra'],
   removeAds: false,
 };
 
@@ -64,12 +66,48 @@ export class SaveService {
     this.write();
   }
 
+  equipMask(id: string): void {
+    if (!this.data.unlockedMasks.includes(id)) return;
+    this.data.maskId = id;
+    this.write();
+  }
+
+  buyMask(id: string, cost: number): boolean {
+    if (this.data.unlockedMasks.includes(id)) return false;
+    if (this.data.impulses < cost) return false;
+    this.data.impulses -= cost;
+    this.data.unlockedMasks.push(id);
+    this.data.maskId = id;
+    this.write();
+    return true;
+  }
+
+  addImpulses(n: number): void {
+    this.data.impulses += n;
+    this.write();
+  }
+
+  addCassettes(n: number): void {
+    this.data.cassettes += n;
+    this.write();
+  }
+
+  setRemoveAds(v: boolean): void {
+    this.data.removeAds = v;
+    this.write();
+  }
+
   private read(): SaveData {
     try {
       const raw = localStorage.getItem(KEY);
       if (!raw) return structuredClone(DEFAULT);
-      const parsed = JSON.parse(raw) as SaveData;
-      return { ...structuredClone(DEFAULT), ...parsed, version: 1 };
+      const parsed = JSON.parse(raw) as Partial<SaveData>;
+      return {
+        ...structuredClone(DEFAULT),
+        ...parsed,
+        unlockedMasks: parsed.unlockedMasks?.length ? parsed.unlockedMasks : ['iskra'],
+        version: 1,
+      };
     } catch {
       return structuredClone(DEFAULT);
     }

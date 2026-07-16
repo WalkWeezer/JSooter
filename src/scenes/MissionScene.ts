@@ -7,6 +7,8 @@ import { gameplayStart, gameplayStop } from '../platform/yandex';
 import { t } from '../i18n';
 import { audioService } from '../audio/AudioService';
 import { getMission } from '../data/missionIndex';
+import { saveService } from '../save/SaveService';
+import { getMask } from '../data/masks';
 
 type Pickup = {
   type: WeaponType;
@@ -86,13 +88,21 @@ export class MissionScene extends Phaser.Scene {
     const spawnX = m.playerSpawn[0] * ts + ts / 2;
     const spawnY = m.playerSpawn[1] * ts + ts / 2;
     this.player = new PlayerActor(this, spawnX, spawnY);
+    const mask = getMask(saveService.get().maskId);
+    if (mask.perk === 'dash') this.player.speed = 185;
     this.physics.add.collider(this.player.body, this.walls);
 
     for (const e of m.enemies) {
       const enemy = new EnemyActor(this, e, ts);
+      if (mask.perk === 'vision') {
+        enemy.cone.setAlpha(1);
+      }
       this.physics.add.collider(enemy.body, this.walls);
       this.enemies.push(enemy);
     }
+
+    this.registry.set('maskPerk', mask.perk);
+    this.registry.set('silencerCharges', mask.perk === 'silencer' ? 1 : 0);
 
     for (const w of m.weapons) {
       const img = this.physics.add.image(w.x * ts + ts / 2, w.y * ts + ts / 2, 'weapon');
@@ -152,6 +162,9 @@ export class MissionScene extends Phaser.Scene {
 
     gameplayStart();
     audioService.playHubHum();
+    void import('../ads/AdsService').then(({ adsService }) => {
+      void adsService.hideSticky();
+    });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.inputRouter.destroy();
@@ -276,13 +289,20 @@ export class MissionScene extends Phaser.Scene {
       if (!melee && diff < 0.35 && !this.lineBlocked(origin.x, origin.y, enemy.body.x, enemy.body.y)) {
         this.neutralizeEnemy(enemy);
         hit = true;
-        this.raiseNoise(origin.x, origin.y, 160);
+        const charges = Number(this.registry.get('silencerCharges') || 0);
+        if (charges > 0) {
+          this.registry.set('silencerCharges', charges - 1);
+        } else {
+          this.raiseNoise(origin.x, origin.y, 160);
+        }
         break;
       }
     }
 
     if (!hit && (this.player.weapon === 'pistol' || this.player.weapon === 'shotgun' || this.player.weapon === 'uzi')) {
-      this.raiseNoise(origin.x, origin.y, 180);
+      const charges = Number(this.registry.get('silencerCharges') || 0);
+      if (charges > 0) this.registry.set('silencerCharges', charges - 1);
+      else this.raiseNoise(origin.x, origin.y, 180);
     }
   }
 

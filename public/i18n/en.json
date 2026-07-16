@@ -16,7 +16,7 @@
     "status": "lang: {{lang}} | sdk: {{sdk}}",
     "cta_hum": "TAP TO START HUM",
     "cta_ready": "READY",
-    "phase_note": "Phase 4: 14 missions\nProgress autosaves\nPick a contract in the list",
+    "phase_note": "Phase 5: masks and shop\nNo story paywall",
     "open_settings": "Settings",
     "open_missions": "Missions",
     "sticky_label": "sticky-safe-area"
@@ -70,7 +70,8 @@
     "buy": "Buy",
     "owned": "Owned",
     "remove_ads": "Remove interstitials",
-    "pack_cassettes": "Cassette pack"
+    "pack_cassettes": "Cassette pack",
+    "equip": "Equip"
   },
   "settings": {
     "title": "Settings",
@@ -100,5 +101,13 @@
     "price": "{{price}}",
     "purchase": "Buy",
     "restore": "Restore"
+  },
+  "masks": {
+    "iskra_name": "Spark",
+    "iskra_desc": "Slightly faster movement",
+    "glushitel_name": "Suppressor",
+    "glushitel_desc": "First gunshot per mission is quieter",
+    "cassette_name": "Cassette",
+    "cassette_desc": "Vision cones are easier to read"
   }
 }

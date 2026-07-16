@@ -19,12 +19,26 @@ export type YandexSdk = {
   on: (event: string, callback: (...args: unknown[]) => void) => void;
   off: (event: string, callback: (...args: unknown[]) => void) => void;
   adv?: {
-    showFullscreenAdv: (opts?: unknown) => void;
-    showRewardedVideo: (opts?: unknown) => void;
+    showFullscreenAdv: (opts?: {
+      callbacks?: {
+        onOpen?: () => void;
+        onClose?: (wasShown: boolean) => void;
+        onError?: (error: unknown) => void;
+      };
+    }) => void;
+    showRewardedVideo: (opts?: {
+      callbacks?: {
+        onOpen?: () => void;
+        onClose?: (wasShown: boolean) => void;
+        onError?: (error: unknown) => void;
+        onRewarded?: () => void;
+      };
+    }) => void;
     getBannerAdvStatus?: () => Promise<{ stickyAdvIsShowing: boolean }>;
     showBannerAdv?: () => Promise<unknown>;
     hideBannerAdv?: () => Promise<unknown>;
   };
+  getPayments?: (opts?: unknown) => Promise<unknown>;
 };
 
 declare global {
@@ -81,8 +95,19 @@ function createMockSdk(): YandexSdk {
       console.info(`[mock-sdk] off(${event})`);
     },
     adv: {
-      showFullscreenAdv: () => console.info('[mock-sdk] showFullscreenAdv()'),
-      showRewardedVideo: () => console.info('[mock-sdk] showRewardedVideo()'),
+      showFullscreenAdv: (opts) => {
+        console.info('[mock-sdk] showFullscreenAdv()');
+        opts?.callbacks?.onOpen?.();
+        window.setTimeout(() => opts?.callbacks?.onClose?.(true), 200);
+      },
+      showRewardedVideo: (opts) => {
+        console.info('[mock-sdk] showRewardedVideo()');
+        opts?.callbacks?.onOpen?.();
+        window.setTimeout(() => {
+          opts?.callbacks?.onRewarded?.();
+          opts?.callbacks?.onClose?.(true);
+        }, 300);
+      },
       getBannerAdvStatus: async () => ({ stickyAdvIsShowing: false }),
       showBannerAdv: async () => ({ stickyAdvIsShowing: true }),
       hideBannerAdv: async () => ({ stickyAdvIsShowing: false }),
