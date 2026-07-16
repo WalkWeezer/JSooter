@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
 import type { MissionResultPayload } from './MissionScene';
+import { saveService } from '../save/SaveService';
+import { getNextMissionId } from '../data/missionIndex';
 
 export class ResultsScene extends Phaser.Scene {
   private payload!: MissionResultPayload;
@@ -17,6 +19,9 @@ export class ResultsScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const pad = Number(this.registry.get('stickyPaddingPx') || 90);
     const p = this.payload;
+    const nextId = getNextMissionId(p.missionId);
+
+    saveService.markCleared(p.missionId, p.rank, p.timeSec, p.deaths, nextId);
 
     this.cameras.main.setBackgroundColor('#0B0D12');
 
@@ -29,7 +34,7 @@ export class ResultsScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height * 0.32, t('results.rank', { rank: p.rank }), {
+      .text(width / 2, height * 0.3, t('results.rank', { rank: p.rank }), {
         fontFamily: 'monospace',
         fontSize: '48px',
         color: p.rank.startsWith('S') ? '#39FF14' : '#FF2A6D',
@@ -39,8 +44,8 @@ export class ResultsScene extends Phaser.Scene {
     this.add
       .text(
         width / 2,
-        height * 0.46,
-        `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}`,
+        height * 0.44,
+        `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}\n${t('shop.impulses', { count: saveService.get().impulses })}`,
         {
           fontFamily: 'monospace',
           fontSize: '16px',
@@ -50,13 +55,27 @@ export class ResultsScene extends Phaser.Scene {
       )
       .setOrigin(0.5);
 
+    if (nextId) {
+      const next = this.add
+        .text(width / 2, height * 0.6, t('results.next'), {
+          fontFamily: 'monospace',
+          fontSize: '18px',
+          color: '#0B0D12',
+          backgroundColor: '#2DE2E6',
+          padding: { x: 16, y: 10 },
+        })
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true });
+      next.on('pointerdown', () => this.scene.start('BriefingScene', { missionId: nextId }));
+    }
+
     const again = this.add
-      .text(width / 2, height * 0.62, t('mission.retry'), {
+      .text(width / 2, height * 0.7, t('mission.retry'), {
         fontFamily: 'monospace',
-        fontSize: '18px',
+        fontSize: '16px',
         color: '#0B0D12',
         backgroundColor: '#FF2A6D',
-        padding: { x: 16, y: 10 },
+        padding: { x: 14, y: 8 },
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
@@ -67,7 +86,7 @@ export class ResultsScene extends Phaser.Scene {
     });
 
     const hub = this.add
-      .text(width / 2, height * 0.74, t('results.to_hub'), {
+      .text(width / 2, height * 0.8, t('results.to_hub'), {
         fontFamily: 'monospace',
         fontSize: '16px',
         color: '#2DE2E6',

@@ -7,11 +7,14 @@ import { BriefingScene } from './scenes/BriefingScene';
 import { MissionScene } from './scenes/MissionScene';
 import { ResultsScene } from './scenes/ResultsScene';
 import { PauseOverlay } from './scenes/PauseOverlay';
+import { MissionSelectScene } from './scenes/MissionSelectScene';
 import { audioService, bindPhaserMute } from './audio/AudioService';
 import { initPlatform, onPlatformPause, onPlatformResume } from './platform/yandex';
+import { saveService } from './save/SaveService';
 
 async function bootstrap(): Promise<void> {
   await initPlatform();
+  saveService.unlock('tut_01');
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -47,6 +50,7 @@ async function bootstrap(): Promise<void> {
       MissionScene,
       ResultsScene,
       PauseOverlay,
+      MissionSelectScene,
     ],
   });
 

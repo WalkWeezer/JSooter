@@ -114,7 +114,7 @@ export class HubScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     missions.on('pointerdown', () => {
-      this.scene.start('BriefingScene', { missionId: 'plat_03' });
+      this.scene.start('MissionSelectScene');
     });
 
     this.add

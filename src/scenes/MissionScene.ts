@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import plat03 from '../data/missions/plat_03.json';
 import { PlayerActor, WEAPON_RANGE, type WeaponType } from '../game/Player';
 import { EnemyActor } from '../game/Enemy';
 import { InputRouter } from '../input/InputRouter';
@@ -7,6 +6,7 @@ import { computeRank, type MissionDef, type Rank } from '../game/types';
 import { gameplayStart, gameplayStop } from '../platform/yandex';
 import { t } from '../i18n';
 import { audioService } from '../audio/AudioService';
+import { getMission } from '../data/missionIndex';
 
 type Pickup = {
   type: WeaponType;
@@ -44,11 +44,8 @@ export class MissionScene extends Phaser.Scene {
   }
 
   init(data: { missionId?: string }): void {
-    this.mission = plat03 as MissionDef;
-    if (data?.missionId && data.missionId !== 'plat_03') {
-      // Phase 3 only ships plat_03
-      this.mission = plat03 as MissionDef;
-    }
+    const id = data?.missionId || 'tut_01';
+    this.mission = getMission(id);
   }
 
   create(): void {
@@ -210,25 +207,47 @@ export class MissionScene extends Phaser.Scene {
     }
 
     // win check
-    if (this.hasCase || this.mission.objective !== 'extract') {
-      const distExit = Phaser.Math.Distance.Between(
-        this.player.body.x,
-        this.player.body.y,
-        this.exitZone.x,
-        this.exitZone.y,
-      );
-      if (distExit < 20 && (this.mission.objective !== 'extract' || this.hasCase)) {
-        this.onWin();
-      }
+    if (this.checkWin()) {
+      this.onWin();
     }
 
     const elapsed = (this.time.now - this.startedAt) / 1000;
+    const objectiveKey =
+      this.mission.objective === 'extract'
+        ? 'briefing.objective_extract'
+        : this.mission.objective === 'silent'
+          ? 'briefing.objective_silent'
+          : this.mission.objective === 'vip'
+            ? 'briefing.objective_vip'
+            : this.mission.objective === 'timed'
+              ? 'briefing.objective_timed'
+              : 'briefing.objective_clear';
     this.hudText?.setText(
-      `${t('briefing.objective_extract')}\n` +
+      `${t(objectiveKey)}\n` +
         `${this.player.weapon.toUpperCase()} | ${t('results.deaths', { count: this.deaths })}\n` +
         `${elapsed.toFixed(1)}s` +
-        (this.hasCase ? ' | CASE' : ''),
+        (this.hasCase ? ' | CASE' : '') +
+        (this.alarm ? ` | ${t('mission.alarm')}` : ''),
     );
+  }
+
+  private checkWin(): boolean {
+    const allDown = this.enemies.every((e) => !e.alive);
+    const atExit =
+      Phaser.Math.Distance.Between(this.player.body.x, this.player.body.y, this.exitZone.x, this.exitZone.y) < 20;
+
+    switch (this.mission.objective) {
+      case 'extract':
+        return this.hasCase && atExit;
+      case 'clear':
+      case 'vip':
+      case 'timed':
+        return allDown;
+      case 'silent':
+        return allDown; // alarm affects rank only
+      default:
+        return allDown && atExit;
+    }
   }
 
   private tryAttack(): void {

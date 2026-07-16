@@ -16,7 +16,7 @@
     "status": "lang: {{lang}} | sdk: {{sdk}}",
     "cta_hum": "TAP TO START HUM",
     "cta_ready": "READY",
-    "phase_note": "Phase 3: vertical slice\nPLAT-03 ready\nHide tab to mute",
+    "phase_note": "Phase 4: 14 missions\nProgress autosaves\nPick a contract in the list",
     "open_settings": "Settings",
     "open_missions": "Missions",
     "sticky_label": "sticky-safe-area"
@@ -29,8 +29,22 @@
     "objective_extract": "Extract and escape",
     "objective_silent": "Silent run",
     "objective_timed": "Timed run",
-    "plat_03_body": "Grab the case from the guarded floor and escape alive. Flank the shield. Guns make noise.",
-    "s_hint": "S: 0 deaths · no alarm · ≤{{sec}}s"
+    "plat_03_body": "Grab the case. Flank the shield only.",
+    "s_hint": "S: 0 deaths · no alarm · ≤{{sec}}s",
+    "default_body": "Short night contract. Hit the objective and stay out of vision cones.",
+    "tut_01_body": "Tutorial: move and neutralize one patrol.",
+    "tut_02_body": "Pick up the bat and strike from behind.",
+    "tut_03_body": "Grab the case and escape past two patrols.",
+    "plat_01_body": "District Plat. Two patrols — learn the route.",
+    "plat_02_body": "Shotgun in a choke point. Do not push the door.",
+    "plat_04_body": "VIP behind a shield. Flank required.",
+    "plat_05_body": "Port floor: case under guard.",
+    "plat_06_body": "Silent contract. Knife preferred.",
+    "plat_07_body": "Dense clear. Multiple routes.",
+    "plat_08_body": "Plat finale. Case and shield at the exit.",
+    "port_01_body": "Port opens. New patrol patterns.",
+    "port_02_body": "Extraction in the warehouse.",
+    "port_03_body": "Heavy port clear."
   },
   "mission": {
     "pause": "Pause",

@@ -1,21 +1,21 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
-import plat03 from '../data/missions/plat_03.json';
+import { getMission } from '../data/missionIndex';
 import type { MissionDef } from '../game/types';
 
 export class BriefingScene extends Phaser.Scene {
-  private missionId = 'plat_03';
+  private missionId = 'tut_01';
 
   constructor() {
     super('BriefingScene');
   }
 
   init(data: { missionId?: string }): void {
-    this.missionId = data?.missionId || 'plat_03';
+    this.missionId = data?.missionId || 'tut_01';
   }
 
   create(): void {
-    const mission = plat03 as MissionDef;
+    const mission = getMission(this.missionId) as MissionDef;
     const { width, height } = this.scale;
     const pad = Number(this.registry.get('stickyPaddingPx') || 90);
 
@@ -37,8 +37,10 @@ export class BriefingScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    const bodyKey = `briefing.${this.missionId}_body`;
+    const body = t(bodyKey);
     this.add
-      .text(width / 2, height * 0.38, t('briefing.plat_03_body'), {
+      .text(width / 2, height * 0.38, body === bodyKey ? t('briefing.default_body') : body, {
         fontFamily: 'monospace',
         fontSize: '15px',
         color: '#cfd6e6',
@@ -47,8 +49,9 @@ export class BriefingScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    const objectiveKey = `briefing.objective_${mission.objective === 'vip' ? 'vip' : mission.objective}`;
     this.add
-      .text(width / 2, height * 0.52, t('briefing.objective_extract'), {
+      .text(width / 2, height * 0.52, t(objectiveKey), {
         fontFamily: 'monospace',
         fontSize: '16px',
         color: '#39FF14',
@@ -56,7 +59,7 @@ export class BriefingScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height * 0.58, `${t('briefing.s_hint', { sec: mission.sRankRules.maxTimeSec })}`, {
+      .text(width / 2, height * 0.58, t('briefing.s_hint', { sec: mission.sRankRules.maxTimeSec }), {
         fontFamily: 'monospace',
         fontSize: '13px',
         color: '#6b7385',
@@ -88,6 +91,6 @@ export class BriefingScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    back.on('pointerdown', () => this.scene.start('HubScene'));
+    back.on('pointerdown', () => this.scene.start('MissionSelectScene'));
   }
 }
