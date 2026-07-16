@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { t } from '../i18n';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -14,7 +15,7 @@ export class PreloadScene extends Phaser.Scene {
     const frame = this.add.rectangle(cx, cy, barWidth, 18, 0x1a1f2b).setStrokeStyle(2, 0x2de2e6);
     const fill = this.add.rectangle(cx - barWidth / 2 + 2, cy, 4, 12, 0xff2a6d).setOrigin(0, 0.5);
     const label = this.add
-      .text(cx, cy - 36, 'NEONTRON', {
+      .text(cx, cy - 36, t('common.brand'), {
         fontFamily: 'monospace',
         fontSize: '18px',
         color: '#2DE2E6',
@@ -25,7 +26,6 @@ export class PreloadScene extends Phaser.Scene {
       fill.width = Math.max(4, (barWidth - 4) * value);
     });
 
-    // Phase 1: no heavy assets yet. Tiny delay keeps loader visible.
     this.load.image(
       'pixel',
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W5aUAAAAASUVORK5CYII=',

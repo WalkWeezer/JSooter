@@ -1,0 +1,88 @@
+{
+  "common": {
+    "brand": "Neontron",
+    "subtitle": "Night Assault",
+    "loading": "Loading…",
+    "back": "Back",
+    "continue": "Continue",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "on": "On",
+    "off": "Off"
+  },
+  "hub": {
+    "title": "Neontron",
+    "subtitle": "Night Assault",
+    "status": "lang: {{lang}} | sdk: {{sdk}}",
+    "cta_hum": "TAP TO START HUM",
+    "cta_ready": "READY",
+    "phase_note": "Phase 2: RU/EN\nHide tab to mute audio\nMissions come in Phase 3",
+    "open_settings": "Settings",
+    "open_missions": "Missions (soon)",
+    "sticky_label": "sticky-safe-area"
+  },
+  "briefing": {
+    "title": "Contract",
+    "start": "Start assault",
+    "objective_clear": "Clear the floor",
+    "objective_vip": "Neutralize the target",
+    "objective_extract": "Extract and escape",
+    "objective_silent": "Silent run",
+    "objective_timed": "Timed run"
+  },
+  "mission": {
+    "pause": "Pause",
+    "resume": "Resume",
+    "retry": "Retry",
+    "died": "Spotted",
+    "exit_hint": "Exit",
+    "alarm": "Alarm"
+  },
+  "results": {
+    "title": "Results",
+    "rank": "Rank {{rank}}",
+    "deaths": "Deaths: {{count}}",
+    "time": "Time: {{time}}",
+    "claim": "Claim rewards",
+    "to_hub": "To hub",
+    "next": "Next contract"
+  },
+  "shop": {
+    "title": "Shop",
+    "impulses": "Impulses: {{count}}",
+    "cassettes": "Cassettes: {{count}}",
+    "buy": "Buy",
+    "owned": "Owned",
+    "remove_ads": "Remove interstitials",
+    "pack_cassettes": "Cassette pack"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "lang_ru": "Русский",
+    "lang_en": "English",
+    "sound": "Sound",
+    "mute": "Mute",
+    "controls": "Controls",
+    "cloud_save": "Save to cloud",
+    "cloud_save_reason": "Sign in with Yandex ID to keep progress across devices"
+  },
+  "tutorial": {
+    "move": "Move",
+    "stealth": "Strike from behind",
+    "vision": "Avoid vision cones",
+    "death": "Failure is part of the plan. Restart is instant",
+    "pickup": "Pick up weapons"
+  },
+  "ads": {
+    "watch_reward": "Watch ad",
+    "reward_x2": "Watch → x2 Impulses",
+    "reward_cones": "Watch → cones 10s",
+    "reward_retry_combo": "Watch → keep combo"
+  },
+  "iap": {
+    "price": "{{price}}",
+    "purchase": "Buy",
+    "restore": "Restore"
+  }
+}

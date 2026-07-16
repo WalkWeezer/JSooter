@@ -150,9 +150,11 @@
 `common.*`, `hub.*`, `briefing.*`, `mission.*`, `results.*`, `shop.*`, `settings.*`, `tutorial.*`, `ads.*`, `iap.*`
 
 **Exit criteria:**
-- [ ] Переключение RU↔EN меняет весь видимый текст хаба/настроек
-- [ ] `npm run check:i18n` = 0 missing keys
-- [ ] Нет захардкоженных пользовательских строк в `src/`
+- [x] Переключение RU↔EN меняет весь видимый текст хаба/настроек
+- [x] `npm run check:i18n` = 0 missing keys
+- [x] Нет захардкоженных пользовательских строк в `src/`
+
+**Статус Phase 2:** DONE (2026-07-16)
 
 ---
 

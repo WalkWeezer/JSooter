@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { PreloadScene } from './scenes/PreloadScene';
 import { HubScene } from './scenes/HubScene';
+import { SettingsScene } from './scenes/SettingsScene';
 import { audioService, bindPhaserMute } from './audio/AudioService';
 import { initPlatform, onPlatformPause, onPlatformResume } from './platform/yandex';
 
@@ -26,7 +27,7 @@ async function bootstrap(): Promise<void> {
     input: {
       activePointers: 3,
     },
-    scene: [BootScene, PreloadScene, HubScene],
+    scene: [BootScene, PreloadScene, HubScene, SettingsScene],
   });
 
   bindPhaserMute(game);
@@ -46,7 +47,6 @@ async function bootstrap(): Promise<void> {
     }
   });
 
-  // Prevent browser gestures that break mobile play.
   document.addEventListener('gesturestart', (e) => e.preventDefault());
   document.addEventListener('contextmenu', (e) => e.preventDefault());
 }
