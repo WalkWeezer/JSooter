@@ -127,10 +127,12 @@
 5. Safe-area / sticky banner padding placeholder
 
 **Exit criteria:**
-- [ ] `npm run dev` открывает хаб
-- [ ] Mock SDK логирует ready/pause/resume
-- [ ] Hidden tab глушит звук (даже если звук — silent beep)
-- [ ] Нет кириллицы в путях
+- [x] `npm run dev` открывает хаб
+- [x] Mock SDK логирует ready/pause/resume
+- [x] Hidden tab глушит звук (даже если звук — silent beep)
+- [x] Нет кириллицы в путях
+
+**Статус Phase 1:** DONE (2026-07-16)
 
 **Запрещено в Phase 1:** миссии, магазин, реклама боевая логика.
 

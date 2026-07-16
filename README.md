@@ -1,11 +1,30 @@
-# Неонтрон: Ночной штурм — GDD для Яндекс Игр
+# Neontron: Night Assault
 
-Top-down action в духе Hotline Miami, заточенный под удержание, монетизацию и требования каталога Яндекс Игр.
+Yandex Games top-down action. Design docs and LLM production plan live in `/docs`.
 
-- **Диздок:** [docs/GDD-NEONTRON.md](docs/GDD-NEONTRON.md)
-- **План для LLM (до готовой игры + промо):** [docs/LLM_PRODUCTION_PLAN.md](docs/LLM_PRODUCTION_PLAN.md)
-- **Визуальный стиль:** [docs/visual-style/](docs/visual-style/README.md)
-- **Саундтрек (референсы):** [docs/audio/](docs/audio/README.md)
-- **Тексты стора RU/EN:** [store/STORE_DRAFT.md](store/STORE_DRAFT.md)
+## Run locally
 
-В репозитории зафиксированы концепция, арт, аудио, стор-тексты и пошаговый план производства. Игровая реализация — с Phase 1 плана.
+```bash
+npm install
+npm run dev
+```
+
+Open the printed localhost URL. Phase 1 uses a **mock Yandex SDK** outside the Yandex host.
+
+- Tap **TAP TO START HUM** to start a quiet tone
+- Hide the tab → audio mutes (requirement 1.3)
+- In console: `__mockSdkEmit('game_api_pause')` / `__mockSdkEmit('game_api_resume')`
+
+## Build
+
+```bash
+npm run build
+```
+
+Output: `dist/` (root `index.html`, latin paths only).
+
+## Docs
+
+- [GDD](docs/GDD-NEONTRON.md)
+- [LLM production plan](docs/LLM_PRODUCTION_PLAN.md)
+- [Store draft RU/EN](store/STORE_DRAFT.md)
