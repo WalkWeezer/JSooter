@@ -12,6 +12,7 @@ export class HubScene extends Phaser.Scene {
   }
 
   create(): void {
+    audioService.attachScene(this);
     this.cameras.main.setBackgroundColor('#0B0D12');
     this.draw();
     this.unsub = onLangChange(() => this.draw());
@@ -26,6 +27,8 @@ export class HubScene extends Phaser.Scene {
       console.info('[hub] marked LoadingAPI.ready — player can interact');
       console.info(`[hub] stickyPaddingPx=${getPlatform().stickyPaddingPx}`);
     }
+
+    audioService.playHubHum();
   }
 
   private draw(): void {

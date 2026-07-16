@@ -1,69 +1,74 @@
 import Phaser from 'phaser';
 
 /**
- * Minimal audio bus for Phase 1.
- * Provides a silent/beep tone and respects tab visibility + platform pause.
+ * Phaser-backed music bus with mute policies for Yandex requirements.
  */
 export class AudioService {
-  private context: AudioContext | null = null;
-  private masterGain: GainNode | null = null;
-  private oscillator: OscillatorNode | null = null;
+  private scene?: Phaser.Scene;
   private mutedByUser = false;
   private mutedBySystem = false;
-  private started = false;
+  private currentKey: 'hub' | 'combat' | null = null;
 
-  async ensureStarted(): Promise<void> {
-    if (this.started) return;
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    this.context = new Ctx();
-    this.masterGain = this.context.createGain();
-    this.masterGain.gain.value = 0.0001;
-    this.masterGain.connect(this.context.destination);
-
-    this.oscillator = this.context.createOscillator();
-    this.oscillator.type = 'sine';
-    this.oscillator.frequency.value = 110;
-    this.oscillator.connect(this.masterGain);
-    this.oscillator.start();
-    this.started = true;
-    this.applyMuteState();
+  attachScene(scene: Phaser.Scene): void {
+    this.scene = scene;
   }
 
   setUserMuted(muted: boolean): void {
     this.mutedByUser = muted;
-    this.applyMuteState();
+    this.apply();
   }
 
   setSystemMuted(muted: boolean): void {
     this.mutedBySystem = muted;
-    this.applyMuteState();
+    this.apply();
   }
 
   isAudible(): boolean {
-    return this.started && !this.mutedByUser && !this.mutedBySystem;
+    return !this.mutedByUser && !this.mutedBySystem;
   }
 
-  /** Soft hub hum — barely audible, enough to verify mute-on-hide. */
   playHubHum(): void {
-    void this.ensureStarted().then(() => {
-      if (!this.masterGain || !this.context) return;
-      if (!this.isAudible()) {
-        this.masterGain.gain.setTargetAtTime(0.0001, this.context.currentTime, 0.01);
-        return;
-      }
-      this.masterGain.gain.setTargetAtTime(0.02, this.context.currentTime, 0.05);
-    });
+    this.playLoop('hub', 'bgm-hub', 0.35);
+  }
+
+  playCombat(): void {
+    this.playLoop('combat', 'bgm-combat', 0.4);
+  }
+
+  playDeathSting(): void {
+    if (!this.scene || !this.isAudible()) return;
+    // short noise burst via existing tone texture not available — use volume blip on hub
+    if (this.scene.cache.audio.exists('bgm-hub')) {
+      const s = this.scene.sound.add('bgm-hub', { volume: 0.05, rate: 0.6 });
+      s.play();
+      this.scene.time.delayedCall(200, () => s.stop());
+    }
   }
 
   stopAll(): void {
-    if (!this.masterGain || !this.context) return;
-    this.masterGain.gain.setTargetAtTime(0.0001, this.context.currentTime, 0.01);
+    this.scene?.sound.stopAll();
+    this.currentKey = null;
   }
 
-  private applyMuteState(): void {
-    if (!this.masterGain || !this.context) return;
-    const target = this.isAudible() ? 0.02 : 0.0001;
-    this.masterGain.gain.setTargetAtTime(target, this.context.currentTime, 0.01);
+  private playLoop(key: 'hub' | 'combat', cacheKey: string, volume: number): void {
+    if (!this.scene) return;
+    if (this.currentKey === key && this.scene.sound.get(cacheKey)?.isPlaying) {
+      this.apply();
+      return;
+    }
+    this.scene.sound.stopAll();
+    if (!this.scene.cache.audio.exists(cacheKey)) {
+      console.warn('[audio] missing', cacheKey);
+      return;
+    }
+    this.scene.sound.play(cacheKey, { loop: true, volume: this.isAudible() ? volume : 0 });
+    this.currentKey = key;
+    this.apply();
+  }
+
+  private apply(): void {
+    if (!this.scene) return;
+    this.scene.sound.mute = !this.isAudible();
     console.info(`[audio] mutedByUser=${this.mutedByUser} mutedBySystem=${this.mutedBySystem}`);
   }
 }

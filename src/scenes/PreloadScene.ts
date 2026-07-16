@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
+import { audioService } from '../audio/AudioService';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -7,6 +8,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload(): void {
+    audioService.attachScene(this);
     const { width, height } = this.scale;
     const barWidth = Math.min(320, width * 0.6);
     const cx = width / 2;
@@ -30,6 +32,8 @@ export class PreloadScene extends Phaser.Scene {
       'pixel',
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W5aUAAAAASUVORK5CYII=',
     );
+    this.load.audio('bgm-hub', 'audio/hub-loop.mp3');
+    this.load.audio('bgm-combat', 'audio/combat-loop.mp3');
 
     this.load.on('complete', () => {
       frame.destroy();

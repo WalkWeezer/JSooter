@@ -9,6 +9,7 @@ import { audioService } from '../audio/AudioService';
 import { getMission } from '../data/missionIndex';
 import { saveService } from '../save/SaveService';
 import { getMask } from '../data/masks';
+import { adsService } from '../ads/AdsService';
 
 type Pickup = {
   type: WeaponType;
@@ -161,10 +162,9 @@ export class MissionScene extends Phaser.Scene {
     });
 
     gameplayStart();
-    audioService.playHubHum();
-    void import('../ads/AdsService').then(({ adsService }) => {
-      void adsService.hideSticky();
-    });
+    audioService.attachScene(this);
+    audioService.playCombat();
+    void adsService.hideSticky();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.inputRouter.destroy();
@@ -347,6 +347,7 @@ export class MissionScene extends Phaser.Scene {
     this.player.kill();
     this.deaths += 1;
     this.registry.set('runDeaths', this.deaths);
+    audioService.playDeathSting();
     this.showDeathAndRestart();
   }
 

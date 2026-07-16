@@ -1,14 +1,28 @@
-# Promo package
+# Promo package — Neontron: Night Assault
 
-Файлы для черновика Яндекс Игр появятся здесь в **Phase 8** плана [`docs/LLM_PRODUCTION_PLAN.md`](../docs/LLM_PRODUCTION_PLAN.md).
+Готово к загрузке в черновик Яндекс Игр. Тексты: [`../store/STORE_DRAFT.md`](../store/STORE_DRAFT.md).
 
-Тексты стора уже подготовлены: [`../store/STORE_DRAFT.md`](../store/STORE_DRAFT.md).
+> Скриншоты сейчас — **gameplay-accurate style frames** в визуальном стиле билда. Перед модерацией желательно заменить на кадры из реального `npm run build` canvas (тот же layout/конусы/палитра).
 
-## Ожидаемые файлы
+## Файлы → поля консоли
 
-- `icon-512.png` — 512×512
-- `cover-800x470.png` — 800×470
-- `cover-wide-1560x520.png` — 1560×520
-- `shot-desktop-01.png` … (16:9, ≥1280 long side)
-- `shot-mobile-01.png` … (9:16 или 16:9 по ориентации)
-- `trailer-landscape.mp4` / `trailer-portrait.mp4` (опционально, ≤28s)
+| Поле | Файл | Размер |
+|---|---|---|
+| Иконка | `icon-512.png` | 512×512 |
+| Обложка | `cover-800x470.png` | 800×470 |
+| Обложка витрины | `cover-wide-1560x520.png` | 1560×520 |
+| Скрин Desktop 1 | `shot-desktop-01.png` | 1920×1080 |
+| Скрин Desktop 2 | `shot-desktop-02.png` | 1920×1080 |
+| Скрин Mobile 1 | `shot-mobile-01.png` | 1080×1920 |
+| Скрин Mobile 2 | `shot-mobile-02.png` | 1080×1920 |
+
+## Правила (уже соблюдены в генерации)
+
+- Иконка/обложка **не** скриншоты геймплея
+- Без рамок со скруглением и без UI Яндекса
+- Название совпадает со стором: **Неонтрон: Ночной штурм** / **Neontron: Night Assault**
+- Геймплей на скринах занимает основной кадр
+
+## Видео
+
+Опционально (Phase 8 nice-to-have): `trailer-landscape.mp4` / `trailer-portrait.mp4` ≤28s. Можно добавить отдельным прогоном.

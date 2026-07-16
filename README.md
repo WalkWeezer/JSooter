@@ -1,30 +1,29 @@
 # Neontron: Night Assault
 
-Yandex Games top-down action. Design docs and LLM production plan live in `/docs`.
+Yandex Games top-down action. RU + EN.
 
-## Run locally
+## Quick start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the printed localhost URL. Phase 1 uses a **mock Yandex SDK** outside the Yandex host.
-
-- Tap **TAP TO START HUM** to start a quiet tone
-- Hide the tab → audio mutes (requirement 1.3)
-- In console: `__mockSdkEmit('game_api_pause')` / `__mockSdkEmit('game_api_resume')`
-
-## Build
-
 ```bash
 npm run build
+npm run check:i18n
+npm run check:budget
+npm run pack:yandex
 ```
 
-Output: `dist/` (root `index.html`, latin paths only).
+Output zip: `release/neontron-yandex.zip`
 
-## Docs
+## Docs & store
 
 - [GDD](docs/GDD-NEONTRON.md)
 - [LLM production plan](docs/LLM_PRODUCTION_PLAN.md)
+- [QA report](docs/QA_REPORT.md)
 - [Store draft RU/EN](store/STORE_DRAFT.md)
+- [Promo assets](promo/README.md)
+- [Visual style](docs/visual-style/README.md)
+- [Audio refs](docs/audio/README.md)

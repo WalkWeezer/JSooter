@@ -279,10 +279,12 @@
 8. Budget scripts
 
 **Exit criteria:**
-- [ ] Rotate mid-fight не ломает UI
-- [ ] Tab hide → mute; return → resume policy корректна
-- [ ] `npm run check:budget` < 100MB unzipped
-- [ ] Нет console errors на happy path
+- [x] Rotate mid-fight не ломает UI
+- [x] Tab hide → mute; return → resume policy корректна
+- [x] `npm run check:budget` < 100MB unzipped
+- [x] Нет console errors на happy path
+
+**Статус Phase 7:** DONE (2026-07-16)
 
 ---
 

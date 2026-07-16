@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import { t, getLang, onLangChange, setLang } from '../i18n';
+import { audioService } from '../audio/AudioService';
 
 export class SettingsScene extends Phaser.Scene {
   private unsub: (() => void) | null = null;
+  private userMuted = false;
 
   constructor() {
     super('SettingsScene');
@@ -43,8 +45,24 @@ export class SettingsScene extends Phaser.Scene {
     this.makeLangButton(width / 2 - 90, pad + 140, 'ru', t('settings.lang_ru'), lang === 'ru');
     this.makeLangButton(width / 2 + 90, pad + 140, 'en', t('settings.lang_en'), lang === 'en');
 
+    const mute = this.add
+      .text(width / 2, pad + 200, `${t('settings.mute')}: ${this.userMuted ? t('common.on') : t('common.off')}`, {
+        fontFamily: 'monospace',
+        fontSize: '16px',
+        color: '#cfd6e6',
+        backgroundColor: '#121820',
+        padding: { x: 12, y: 8 },
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    mute.on('pointerdown', () => {
+      this.userMuted = !this.userMuted;
+      audioService.setUserMuted(this.userMuted);
+      this.draw();
+    });
+
     this.add
-      .text(width / 2, pad + 220, t('settings.cloud_save_reason'), {
+      .text(width / 2, pad + 260, t('settings.cloud_save_reason'), {
         fontFamily: 'monospace',
         fontSize: '13px',
         color: '#6b7385',
@@ -54,7 +72,7 @@ export class SettingsScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const cloud = this.add
-      .text(width / 2, pad + 290, t('settings.cloud_save'), {
+      .text(width / 2, pad + 320, t('settings.cloud_save'), {
         fontFamily: 'monospace',
         fontSize: '16px',
         color: '#0B0D12',

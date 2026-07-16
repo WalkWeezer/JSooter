@@ -79,8 +79,16 @@ async function bootstrap(): Promise<void> {
     }
   });
 
+    // Prevent browser gestures that break mobile play.
   document.addEventListener('gesturestart', (e) => e.preventDefault());
   document.addEventListener('contextmenu', (e) => e.preventDefault());
+  document.addEventListener(
+    'touchmove',
+    (e) => {
+      if (e.cancelable) e.preventDefault();
+    },
+    { passive: false },
+  );
 }
 
 bootstrap().catch((error) => {
