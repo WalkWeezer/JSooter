@@ -102,8 +102,23 @@ export class HubScene extends Phaser.Scene {
 
     settings.on('pointerdown', () => this.scene.start('SettingsScene'));
 
+    const missions = this.add
+      .text(width / 2, height * 0.72, t('hub.open_missions'), {
+        fontFamily: 'monospace',
+        fontSize: '18px',
+        color: '#0B0D12',
+        backgroundColor: '#FF2A6D',
+        padding: { x: 14, y: 8 },
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    missions.on('pointerdown', () => {
+      this.scene.start('BriefingScene', { missionId: 'plat_03' });
+    });
+
     this.add
-      .text(width / 2, height * 0.74, t('hub.phase_note'), {
+      .text(width / 2, height * 0.84, t('hub.phase_note'), {
         fontFamily: 'monospace',
         fontSize: '13px',
         color: '#6b7385',

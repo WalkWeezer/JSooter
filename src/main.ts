@@ -3,6 +3,10 @@ import { BootScene } from './scenes/BootScene';
 import { PreloadScene } from './scenes/PreloadScene';
 import { HubScene } from './scenes/HubScene';
 import { SettingsScene } from './scenes/SettingsScene';
+import { BriefingScene } from './scenes/BriefingScene';
+import { MissionScene } from './scenes/MissionScene';
+import { ResultsScene } from './scenes/ResultsScene';
+import { PauseOverlay } from './scenes/PauseOverlay';
 import { audioService, bindPhaserMute } from './audio/AudioService';
 import { initPlatform, onPlatformPause, onPlatformResume } from './platform/yandex';
 
@@ -19,6 +23,13 @@ async function bootstrap(): Promise<void> {
       width: window.innerWidth,
       height: window.innerHeight,
     },
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: { x: 0, y: 0 },
+        debug: false,
+      },
+    },
     render: {
       antialias: true,
       pixelArt: false,
@@ -27,7 +38,16 @@ async function bootstrap(): Promise<void> {
     input: {
       activePointers: 3,
     },
-    scene: [BootScene, PreloadScene, HubScene, SettingsScene],
+    scene: [
+      BootScene,
+      PreloadScene,
+      HubScene,
+      SettingsScene,
+      BriefingScene,
+      MissionScene,
+      ResultsScene,
+      PauseOverlay,
+    ],
   });
 
   bindPhaserMute(game);
@@ -36,6 +56,9 @@ async function bootstrap(): Promise<void> {
     audioService.setSystemMuted(true);
     audioService.stopAll();
     game.sound.mute = true;
+    if (game.scene.isActive('MissionScene')) {
+      game.scene.pause('MissionScene');
+    }
     console.info('[main] platform pause → audio muted');
   });
 
@@ -43,6 +66,9 @@ async function bootstrap(): Promise<void> {
     if (!document.hidden) {
       audioService.setSystemMuted(false);
       game.sound.mute = false;
+      if (game.scene.isPaused('MissionScene') && !game.scene.isActive('PauseOverlay')) {
+        game.scene.resume('MissionScene');
+      }
       console.info('[main] platform resume → audio unmuted');
     }
   });

@@ -16,9 +16,9 @@
     "status": "lang: {{lang}} | sdk: {{sdk}}",
     "cta_hum": "TAP TO START HUM",
     "cta_ready": "READY",
-    "phase_note": "Phase 2: RU/EN\nHide tab to mute audio\nMissions come in Phase 3",
+    "phase_note": "Phase 3: vertical slice\nPLAT-03 ready\nHide tab to mute",
     "open_settings": "Settings",
-    "open_missions": "Missions (soon)",
+    "open_missions": "Missions",
     "sticky_label": "sticky-safe-area"
   },
   "briefing": {
@@ -28,7 +28,9 @@
     "objective_vip": "Neutralize the target",
     "objective_extract": "Extract and escape",
     "objective_silent": "Silent run",
-    "objective_timed": "Timed run"
+    "objective_timed": "Timed run",
+    "plat_03_body": "Grab the case from the guarded floor and escape alive. Flank the shield. Guns make noise.",
+    "s_hint": "S: 0 deaths · no alarm · ≤{{sec}}s"
   },
   "mission": {
     "pause": "Pause",

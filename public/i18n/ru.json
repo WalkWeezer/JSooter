@@ -16,9 +16,9 @@
     "status": "язык: {{lang}} | sdk: {{sdk}}",
     "cta_hum": "НАЖМИ — ЗВУК",
     "cta_ready": "ГОТОВО",
-    "phase_note": "Фаза 2: RU/EN\nСкрой вкладку — звук выключится\nМиссии — в фазе 3",
+    "phase_note": "Фаза 3: vertical slice\nPLAT-03 готов\nСкрой вкладку — mute",
     "open_settings": "Настройки",
-    "open_missions": "Миссии (скоро)",
+    "open_missions": "Миссии",
     "sticky_label": "зона sticky-баннера"
   },
   "briefing": {
@@ -28,7 +28,9 @@
     "objective_vip": "Нейтрализовать цель",
     "objective_extract": "Извлечь и выйти",
     "objective_silent": "Тихий режим",
-    "objective_timed": "На время"
+    "objective_timed": "На время",
+    "plat_03_body": "Забери кейс с охраняемого этажа и выйди живым. Заходи щитовику за спину. Огнестрел шумит.",
+    "s_hint": "S: 0 смертей · без тревоги · ≤{{sec}}s"
   },
   "mission": {
     "pause": "Пауза",

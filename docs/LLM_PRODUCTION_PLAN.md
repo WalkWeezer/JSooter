@@ -179,12 +179,12 @@
 - dissolve VFX как tint+particles (не кровь)
 
 **Exit criteria:**
-- [ ] 5 внешних/внутренних прогонов: смерть → мгновенный рестарт работает
-- [ ] Победа открывает Results
-- [ ] Touch и desktop оба проходят миссию
-- [ ] Portrait playable one-hand (кнопки не перекрывают центр)
+- [x] 5 внешних/внутренних прогонов: смерть → мгновенный рестарт работает
+- [x] Победа открывает Results
+- [x] Touch и desktop оба проходят миссию
+- [x] Portrait playable one-hand (кнопки не перекрывают центр)
 
-**Запрещено:** мета-прогрессия, IAP, daily.
+**Статус Phase 3:** DONE (2026-07-16) — миссия `plat_03`, twin-stick + WASD/mouse, ranks, dissolve VFX
 
 ---
 
