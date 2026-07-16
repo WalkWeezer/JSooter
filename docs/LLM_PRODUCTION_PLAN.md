@@ -397,11 +397,13 @@ action, arcade, shooter, neon, top-down, missions, restart
 
 #### 8.6 Exit criteria Phase 8
 
-- [ ] Все обязательные файлы из таблицы 8.1 существуют
-- [ ] `STORE_DRAFT.md` заполнен RU+EN с проверкой длины полей
-- [ ] Название одинаково в игре, иконке/обложке и черновике
-- [ ] `promo/README.md` описывает что загружать в какое поле консоли
-- [ ] Нет мата, политики, чужих логотипов, рамок со скруглением на иконке/обложке
+- [x] Все обязательные файлы из таблицы 8.1 существуют
+- [x] `STORE_DRAFT.md` заполнен RU+EN с проверкой длины полей
+- [x] Название одинаково в игре, иконке/обложке и черновике
+- [x] `promo/README.md` описывает что загружать в какое поле консоли
+- [x] Нет мата, политики, чужих логотипов, рамок со скруглением на иконке/обложке
+
+**Статус Phase 8:** DONE (2026-07-16) — style-accurate shots; replace with live canvas captures before moderation if possible
 
 ---
 
@@ -446,9 +448,11 @@ action, arcade, shooter, neon, top-down, missions, restart
 | 5.x promo rules | |
 
 **Exit criteria:**
-- [ ] ZIP готов
-- [ ] QA_REPORT без критических fail
-- [ ] Человек может залить zip + promo в консоль по инструкции `promo/README.md`
+- [x] ZIP готов
+- [x] QA_REPORT без критических fail
+- [x] Человек может залить zip + promo в консоль по инструкции `promo/README.md`
+
+**Статус Phase 9:** DONE (2026-07-16) — see `docs/QA_REPORT.md`
 
 ---
 
@@ -572,7 +576,7 @@ Post-MVP (не блокирует первую модерацию): daily, weekl
 ## 8. Статус этого документа
 
 - [x] План написан под LLM-исполнение
-- [ ] Phase 1…9 выполнены
+- [x] Phase 1…9 выполнены
 - [ ] Игра в модерации
 
-**Следующий конкретный шаг:** запустить Prompt Phase 1.
+**Следующий конкретный шаг:** загрузить `release/neontron-yandex.zip` + `promo/` + тексты из `store/STORE_DRAFT.md` в Консоль Яндекс Игр.
