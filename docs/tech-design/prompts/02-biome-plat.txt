@@ -1,0 +1,11 @@
+{PASTE MASTER.txt HERE}
+
+Produce a 32x32 top-down seamless tile atlas for DISTRICT PLAT nightclub biome.
+Labeled rows on dark background:
+- floor_lounge, floor_dance, floor_bar, floor_bath, floor_corridor
+- wall_solid with neon edge variants cyan / magenta / violet
+- exit pad in phosphor green
+Subtle wet reflection, club lighting, readable at game scale.
+Output clean atlas PNG for Phaser slicing.
+
+Negative: {PASTE NEGATIVE.txt HERE}

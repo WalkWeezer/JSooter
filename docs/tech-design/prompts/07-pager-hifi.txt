@@ -1,0 +1,11 @@
+{PASTE MASTER.txt HERE}
+
+Hi-fi UI mock: Neontron handheld pager device.
+Portrait composition. Matte black industrial bezel with corner screws, small cyan "N" at bottom.
+Inner near-black LCD with phosphor green (#39FF14) text and cyan brand header "NEONTRON"
+in geometric display font; mission list with codes NA-01, titles, RISK badges, chevrons.
+Bottom tabs with icons: MISSIONS, LOADOUT, INTEL, SYSTEM (one active).
+Behind device: blurred rainy neon city.
+Match product wireframe spacing; readable; not cluttered; no purple UI kits.
+
+Negative: {PASTE NEGATIVE.txt HERE}

@@ -1,0 +1,12 @@
+{PASTE MASTER.txt HERE}
+
+Top-down PLAYER animation sheet, 64x64 frames, 8 columns, transparent background.
+Rows:
+idle_down, idle_up, idle_left, idle_right,
+walk_down, walk_up, walk_left, walk_right,
+melee_swing (4 frames),
+death_dissolve (4 frames cyan/magenta glitch shards, NO blood).
+Character: dark courier silhouette, cyan outline ~2px, pager on belt, no facial detail.
+Consistent center pivot. Pixel-crisp.
+
+Negative: {PASTE NEGATIVE.txt HERE}

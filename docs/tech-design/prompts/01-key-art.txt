@@ -1,0 +1,10 @@
+{PASTE MASTER.txt HERE}
+
+Create vertical key art for Yandex Games store card.
+Hero: anonymous courier silhouette holding a glowing cyan pager, rainy New-Rail port at night.
+Huge neon signage "NEONTRON" as the hero-level brand; smaller subtitle "NIGHT ASSAULT".
+Optional futuristic motorcycle mid-ground. Bokeh neon city, wet reflective street.
+No UI chrome, no HUD, no stickers.
+Aspect ratio 2:3. High contrast. If you remove any nav, brand must still dominate.
+
+Negative: {PASTE NEGATIVE.txt HERE}

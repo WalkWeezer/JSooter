@@ -1,0 +1,8 @@
+{PASTE MASTER.txt HERE}
+
+VFX strip 256x64 pixels, transparent background.
+Enemy neutralization sequence, 6 frames left-to-right:
+intact masked top-down silhouette → digital glitch slices → cyan/magenta neon shards → empty.
+Stylized, arcade-readable, friendly to instant restart. NO blood, NO wounds.
+
+Negative: {PASTE NEGATIVE.txt HERE}

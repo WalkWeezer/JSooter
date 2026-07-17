@@ -1,0 +1,13 @@
+{PASTE MASTER.txt HERE}
+
+Top-down ENEMY animation sheets, 64x64, 8 columns, transparent background.
+Four clearly different silhouettes:
+1) patrol — slim mask, magenta trim
+2) shotgun — bulkier torso, short weapon readable from top
+3) shield — front plate clearly readable from top-down
+4) sniper — thin body, long rifle
+Each archetype rows: idle 4-dir, walk 4-dir, shoot recoil 2 frames, down/dissolve 4 frames.
+Include a note/thumbnail for VIP shield with amber underglow.
+No blood.
+
+Negative: {PASTE NEGATIVE.txt HERE}

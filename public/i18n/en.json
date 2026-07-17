@@ -1,0 +1,150 @@
+{
+  "common": {
+    "brand": "Neontron",
+    "subtitle": "Night Assault",
+    "loading": "Loading…",
+    "back": "Back",
+    "continue": "Continue",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "on": "On",
+    "off": "Off"
+  },
+  "hub": {
+    "title": "Neontron",
+    "subtitle": "Night Assault",
+    "status": "lang: {{lang}} | sdk: {{sdk}}",
+    "cta_hum": "TAP TO START HUM",
+    "cta_ready": "READY",
+    "phase_note": "Phase 5: masks and shop\nNo story paywall",
+    "open_settings": "Settings",
+    "open_missions": "Missions",
+    "mobile_play": "Mobile controls",
+    "sticky_label": "sticky-safe-area"
+  },
+  "pager": {
+    "tab_missions": "MISSIONS",
+    "tab_loadout": "LOADOUT",
+    "tab_intel": "INTEL",
+    "tab_system": "SYSTEM",
+    "night_assault": "NIGHT ASSAULT",
+    "tagline": "COVERT OPS. NOCTURNAL STRIKES. DENY. DISRUPT. DESTROY.",
+    "risk": "RISK",
+    "locked": "// CLASSIFIED //",
+    "unlock_hint": "COMPLETE {{id}}",
+    "signal": "SIGNAL",
+    "signal_ok": "STABLE",
+    "district": "DISTRICT",
+    "footer": "NEONTRON SYSTEMS CORP. · 2087",
+    "contract": "CONTRACT",
+    "rank_log": "RESULT LOG"
+  },
+  "missions": {
+    "tut_01_name": "SIGNAL CHECK",
+    "tut_02_name": "REAR ENTRY",
+    "tut_03_name": "CASE DRILL",
+    "plat_01_name": "FIRST ADDRESS",
+    "plat_02_name": "CHOKE POINT",
+    "plat_03_name": "BLACKOUT HARBOR",
+    "plat_04_name": "VIP SHADOW",
+    "plat_05_name": "WET DOCK",
+    "plat_06_name": "KNIFE PROTOCOL",
+    "plat_07_name": "GRID SWEEP",
+    "plat_08_name": "PLAT FINALE",
+    "port_01_name": "ZARYA GATE",
+    "port_02_name": "WAREHOUSE RUN",
+    "port_03_name": "PORT STORM"
+  },
+  "briefing": {
+    "title": "Contract",
+    "start": "Start assault",
+    "objective_clear": "Clear the floor → exit",
+    "objective_vip": "Neutralize VIP → exit",
+    "objective_extract": "Grab the case → exit",
+    "objective_silent": "Silent clear → exit",
+    "objective_timed": "Beat the clock → exit",
+    "s_hint": "S: 0 deaths · no alarm · ≤{{sec}}s",
+    "default_body": "Short night contract. Hit the objective and stay out of vision cones.",
+    "tut_01_body": "Pick up the bat. Strike the patrol from behind. Reach the exit.",
+    "tut_02_body": "Patrol walks the booth. Don't walk into the cone — flank or wait.",
+    "tut_03_body": "Case in the mid room. Shotgun covers the south door — take the north flank.",
+    "plat_01_body": "Three bays. North path is faster, south is safer. Shotgun in the middle.",
+    "plat_02_body": "Never push the shotgun door. The side route has a sniper beam.",
+    "plat_03_body": "Blackout Harbor: case under a shield. Shotgun on the south choke. S = no alarm.",
+    "plat_04_body": "VIP in the office (amber mark). You can skip the rest. Exit after the hit.",
+    "plat_05_body": "Silent dock. Knife and bat only. Crossing routes — keep the noise down.",
+    "plat_06_body": "Cubicle maze. Backstabs pay. Shotgun waits on the last choke.",
+    "plat_07_body": "Three lanes. Center is aggression, sides are stealth. Clear all, then exit.",
+    "plat_08_body": "Plat finale: case behind VIP and shotgun. Clock is ticking — grab and go.",
+    "port_01_body": "Zarya Gate: case in the vault. More patrols, same extract loop.",
+    "port_02_body": "Warehouse aisles. Long sightlines. Case mid-row — carry it to the exit.",
+    "port_03_body": "Port Storm. Pocket rooms with shotguns and a shield. Survive the clear."
+  },
+  "mission": {
+    "pause": "Pause",
+    "resume": "Resume",
+    "retry": "Retry",
+    "restart": "Restart",
+    "died": "Killed",
+    "exit_hint": "Exit",
+    "alarm": "Alarm",
+    "range": "Range",
+    "in_range": "IN RANGE — attack!"
+  },
+  "results": {
+    "title": "Results",
+    "rank": "Rank {{rank}}",
+    "deaths": "Deaths: {{count}}",
+    "time": "Time: {{time}}",
+    "claim": "Claim rewards",
+    "to_hub": "To hub",
+    "next": "Next contract"
+  },
+  "shop": {
+    "title": "Shop",
+    "impulses": "Impulses: {{count}}",
+    "cassettes": "Cassettes: {{count}}",
+    "buy": "Buy",
+    "owned": "Owned",
+    "remove_ads": "Remove interstitials",
+    "pack_cassettes": "Cassette pack",
+    "equip": "Equip"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "lang_ru": "Русский",
+    "lang_en": "English",
+    "sound": "Sound",
+    "mute": "Mute",
+    "controls": "Controls",
+    "cloud_save": "Save to cloud",
+    "cloud_save_reason": "Sign in with Yandex ID to keep progress across devices"
+  },
+  "tutorial": {
+    "move": "Move",
+    "stealth": "Strike from behind",
+    "vision": "Avoid vision cones",
+    "death": "Failure is part of the plan. Restart is instant",
+    "pickup": "Pick up weapons"
+  },
+  "ads": {
+    "watch_reward": "Watch ad",
+    "reward_x2": "Watch → x2 Impulses",
+    "reward_cones": "Watch → cones 10s",
+    "reward_retry_combo": "Watch → keep combo"
+  },
+  "iap": {
+    "price": "{{price}}",
+    "purchase": "Buy",
+    "restore": "Restore"
+  },
+  "masks": {
+    "iskra_name": "Spark",
+    "iskra_desc": "Slightly faster movement",
+    "glushitel_name": "Suppressor",
+    "glushitel_desc": "First gunshot per mission is quieter",
+    "cassette_name": "Cassette",
+    "cassette_desc": "Vision cones are easier to read"
+  }
+}
