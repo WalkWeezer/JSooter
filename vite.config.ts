@@ -12,9 +12,9 @@ export default defineConfig({
     },
   },
   server: {
-    host: true, // 0.0.0.0 — нужен для Network URL
+    host: true, // 0.0.0.0 — нужен для Network URL / preview
     port: 5173,
-    strictPort: false,
+    strictPort: true, // не прыгать на 5174 — иначе preview ломается
   },
   build: {
     outDir: 'dist',
