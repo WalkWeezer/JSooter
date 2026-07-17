@@ -18,6 +18,7 @@ import { getMask } from '../data/masks';
 import { adsService } from '../ads/AdsService';
 import { WEAPON_TEXTURE, ensureFallbackTextures, segmentHitsWall } from '../game/SpriteFactory';
 import { CombatVfx } from '../game/CombatVfx';
+import { registerCharacterAnims } from '../game/CharacterAnims';
 
 type Pickup = {
   type: WeaponType;
@@ -74,6 +75,7 @@ export class MissionScene extends Phaser.Scene {
     this.wallRects = [];
 
     ensureFallbackTextures(this);
+    registerCharacterAnims(this);
     this.vfx = new CombatVfx(this);
 
     const m = this.mission;
@@ -382,6 +384,7 @@ export class MissionScene extends Phaser.Scene {
   private tryAttack(): void {
     if (!this.player.alive || this.player.attackCooldown > 0) return;
     this.player.attackCooldown = IS_MELEE[this.player.weapon] ? 220 : 160;
+    this.player.playAttack();
 
     const facing = this.player.facing;
     const origin = this.player.body;

@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import type { EnemyDef } from './types';
-import { ENEMY_TEXTURE, raycastWalls } from './SpriteFactory';
+import { raycastWalls } from './SpriteFactory';
+import { ENEMY_ANIM_SHEETS, playAnim } from './CharacterAnims';
 
 export class EnemyActor {
-  readonly body: Phaser.Physics.Arcade.Image;
+  readonly body: Phaser.Physics.Arcade.Sprite;
   readonly cone: Phaser.GameObjects.Graphics;
   readonly type: EnemyDef['type'];
   route: Phaser.Math.Vector2[] = [];
@@ -18,17 +19,20 @@ export class EnemyActor {
   /** rad/sec */
   turnSpeed = 2.4;
   private walls: Phaser.Geom.Rectangle[] = [];
+  private readonly animPrefix: string;
 
   constructor(scene: Phaser.Scene, def: EnemyDef, tileSize: number) {
     const x = def.x * tileSize + tileSize / 2;
     const y = def.y * tileSize + tileSize / 2;
     this.type = def.type;
-    const tex = ENEMY_TEXTURE[def.type] || 'enemy_patrol';
-    this.body = scene.physics.add.image(x, y, tex);
+    const sheet = ENEMY_ANIM_SHEETS[def.type] || ENEMY_ANIM_SHEETS.patrol;
+    this.animPrefix = `enemy_${def.type in ENEMY_ANIM_SHEETS ? def.type : 'patrol'}`;
+    this.body = scene.physics.add.sprite(x, y, sheet, 0);
     this.body.setCircle(14, 2, 2);
     this.body.setImmovable(true);
     this.body.setDepth(18);
     this.body.setDisplaySize(50, 50);
+    playAnim(this.body, `${this.animPrefix}_idle`, false);
     this.cone = scene.add.graphics().setDepth(5);
     this.facing = Phaser.Math.DegToRad(def.facing ?? 0);
     this.targetFacing = this.facing;
@@ -86,16 +90,25 @@ export class EnemyActor {
     this.facing = Phaser.Math.Angle.RotateTo(this.facing, this.targetFacing, this.turnSpeed * dt);
     this.body.setRotation(this.facing);
 
+    let moving = false;
     if (moveAngle !== null) {
       const aligned = Math.abs(Phaser.Math.Angle.Wrap(moveAngle - this.facing)) < 0.55;
       const spd = this.alert >= 0.55 ? this.speed * 1.2 : this.speed;
       if (aligned) {
         this.body.setVelocity(Math.cos(this.facing) * spd, Math.sin(this.facing) * spd);
+        moving = true;
       } else {
         this.body.setVelocity(Math.cos(this.facing) * spd * 0.25, Math.sin(this.facing) * spd * 0.25);
+        moving = true;
       }
     } else {
       this.body.setVelocity(0);
+    }
+
+    if (this.alert >= 0.55) {
+      playAnim(this.body, moving ? `${this.animPrefix}_walk` : `${this.animPrefix}_alert`);
+    } else {
+      playAnim(this.body, moving ? `${this.animPrefix}_walk` : `${this.animPrefix}_idle`);
     }
 
     this.drawCone();
@@ -108,17 +121,15 @@ export class EnemyActor {
     const angleTo = Math.atan2(py - this.body.y, px - this.body.x);
     const diff = Phaser.Math.Angle.Wrap(angleTo - this.facing);
     if (Math.abs(diff) > this.visionFov / 2) return false;
-    // Walls fully block vision
     if (blocked(this.body.x, this.body.y, px, py)) return false;
     return true;
   }
 
-  /** Vision wedge clipped by walls — each ray stops at first wall. */
   drawCone(): void {
     this.cone.clear();
     if (!this.alive) return;
     const alertHot = this.alert >= 0.55;
-    const fill = alertHot ? 0xff2a6d : 0xff2a6d;
+    const fill = 0xff2a6d;
     this.cone.fillStyle(fill, alertHot ? 0.3 : 0.18);
     this.cone.beginPath();
     this.cone.moveTo(this.body.x, this.body.y);
@@ -153,9 +164,11 @@ export class EnemyActor {
   neutralize(): void {
     this.alive = false;
     this.body.setVelocity(0);
-    this.body.setTexture('enemy_down');
-    this.body.setAlpha(0.55);
     this.cone.clear();
+    playAnim(this.body, `${this.animPrefix}_death`, false);
+    this.body.once('animationcomplete', () => {
+      if (this.body.active) this.body.setAlpha(0.45);
+    });
   }
 
   destroy(): void {
