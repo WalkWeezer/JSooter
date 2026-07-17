@@ -39,7 +39,15 @@ export class InputRouter {
   private isTouch: boolean;
 
   constructor(private scene: Phaser.Scene) {
-    this.isTouch = scene.sys.game.device.input.touch;
+    const params = new URLSearchParams(window.location.search);
+    const forceTouch =
+      params.get('mobile') === '1' ||
+      params.get('touch') === '1' ||
+      scene.registry.get('forceTouchUi') === true ||
+      scene.scale.width < 720;
+    this.isTouch = Boolean(
+      forceTouch || scene.sys.game.device.input.touch || scene.sys.game.device.os.android || scene.sys.game.device.os.iOS,
+    );
     const kb = scene.input.keyboard!;
     this.keys = {
       w: kb.addKey('W'),
@@ -57,7 +65,7 @@ export class InputRouter {
     scene.input.on('pointermove', this.onPointerMove, this);
     scene.input.on('pointerup', this.onPointerUp, this);
 
-    if (this.isTouch || scene.sys.game.device.os.android || scene.sys.game.device.os.iOS) {
+    if (this.isTouch) {
       this.createTouchUi();
     }
   }

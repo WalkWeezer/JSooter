@@ -19,6 +19,7 @@
     "phase_note": "Phase 5: masks and shop\nNo story paywall",
     "open_settings": "Settings",
     "open_missions": "Missions",
+    "mobile_play": "Mobile controls",
     "sticky_label": "sticky-safe-area"
   },
   "briefing": {
@@ -50,7 +51,7 @@
     "pause": "Pause",
     "resume": "Resume",
     "retry": "Retry",
-    "died": "Spotted",
+    "died": "Killed",
     "exit_hint": "Exit",
     "alarm": "Alarm",
     "range": "Range",

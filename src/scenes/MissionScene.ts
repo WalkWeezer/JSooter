@@ -88,7 +88,13 @@ export class MissionScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, mapW, mapH);
     this.cameras.main.setBackgroundColor('#07080c');
     this.cameras.main.setRoundPixels(true);
-    this.cameras.main.setZoom(1.5);
+    // Large maps should scroll — don't fit whole floor on screen
+    const fitZoom = Math.min(
+      (this.scale.width * 0.92) / Math.min(mapW, 640),
+      (this.scale.height * 0.92) / Math.min(mapH, 480),
+      1.15,
+    );
+    this.cameras.main.setZoom(Phaser.Math.Clamp(fitZoom, 0.85, 1.15));
 
     const wallSet = new Set(m.walls.map(([x, y]) => `${x},${y}`));
     paintClubLevel(this, m, wallSet);
@@ -107,6 +113,9 @@ export class MissionScene extends Phaser.Scene {
     for (const e of m.enemies) {
       const enemy = new EnemyActor(this, e, ts);
       enemy.setWalls(this.wallRects);
+      enemy.setCombatHooks({
+        onShoot: (ent, aim) => this.enemyShoot(ent, aim),
+      });
       if (mask.perk === 'vision') {
         enemy.cone.setAlpha(1);
       }
@@ -249,16 +258,18 @@ export class MissionScene extends Phaser.Scene {
 
     const playerPos = new Phaser.Math.Vector2(this.player.body.x, this.player.body.y);
     for (const enemy of this.enemies) {
-      enemy.update(delta, this.alarm ? playerPos : null);
-      if (enemy.alive && enemy.canSee(this.player.body.x, this.player.body.y, this.lineBlocked.bind(this))) {
-        this.onSpotted();
-        return;
+      if (!enemy.alive) continue;
+      const sees = enemy.canSee(this.player.body.x, this.player.body.y, this.lineBlocked.bind(this));
+      if (sees && enemy.alert < 0.55) {
+        this.raiseAlarm(enemy);
       }
+      enemy.update(delta, this.alarm ? playerPos : null, sees && this.alarm);
+
+      // Point-blank catch still kills (stealth fail / brawl)
       if (
-        enemy.alive &&
-        Phaser.Math.Distance.Between(enemy.body.x, enemy.body.y, this.player.body.x, this.player.body.y) < 18
+        Phaser.Math.Distance.Between(enemy.body.x, enemy.body.y, this.player.body.x, this.player.body.y) < 20
       ) {
-        this.onSpotted();
+        this.killPlayer();
         return;
       }
     }
@@ -427,22 +438,73 @@ export class MissionScene extends Phaser.Scene {
   }
 
   private raiseNoise(x: number, y: number, radius: number): void {
+    let any = false;
     for (const enemy of this.enemies) {
       if (!enemy.alive) continue;
       if (Phaser.Math.Distance.Between(enemy.body.x, enemy.body.y, x, y) < radius) {
         enemy.alert = 1;
-        // turn toward noise gradually via targetFacing
         enemy.targetFacing = Math.atan2(y - enemy.body.y, x - enemy.body.x);
-        this.alarm = true;
+        any = true;
       }
     }
+    if (any) this.alarm = true;
   }
 
-  private lineBlocked(x1: number, y1: number, x2: number, y2: number): boolean {
-    return segmentHitsWall(x1, y1, x2, y2, this.wallRects, 20);
+  /** Detection → full alarm → shootout (not instant death). */
+  private raiseAlarm(spotter: EnemyActor): void {
+    if (this.ended) return;
+    this.alarm = true;
+    spotter.alert = 1;
+    for (const enemy of this.enemies) {
+      if (!enemy.alive) continue;
+      enemy.alert = 1;
+      enemy.targetFacing = Math.atan2(
+        this.player.body.y - enemy.body.y,
+        this.player.body.x - enemy.body.x,
+      );
+    }
+    this.cameras.main.flash(80, 255, 42, 109, false);
+    const banner = this.add
+      .text(this.scale.width / 2, 72, t('mission.alarm'), {
+        fontFamily: 'monospace',
+        fontSize: '22px',
+        color: '#FF2A6D',
+        backgroundColor: '#0b0d12cc',
+        padding: { x: 12, y: 8 },
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(2500);
+    this.tweens.add({
+      targets: banner,
+      alpha: 0,
+      y: 40,
+      duration: 900,
+      onComplete: () => banner.destroy(),
+    });
   }
 
-  private onSpotted(): void {
+  private enemyShoot(enemy: EnemyActor, aim: number): void {
+    if (!this.player.alive || this.ended) return;
+    const weapon = enemy.type === 'shotgun' ? 'shotgun' : enemy.type === 'sniper' ? 'pistol' : 'uzi';
+    this.vfx.spawnBullet(
+      enemy.body.x,
+      enemy.body.y,
+      aim,
+      weapon,
+      (bx, by) => {
+        if (!this.player.alive) return false;
+        if (Phaser.Math.Distance.Between(bx, by, this.player.body.x, this.player.body.y) < 16) {
+          this.killPlayer();
+          return true;
+        }
+        return false;
+      },
+      this.lineBlocked.bind(this),
+    );
+  }
+
+  private killPlayer(): void {
     if (this.ended || !this.player.alive) return;
     this.player.kill();
     this.deaths += 1;
@@ -450,6 +512,10 @@ export class MissionScene extends Phaser.Scene {
     audioService.playDeathSting();
     this.cameras.main.flash(120, 255, 42, 109, false);
     this.showDeathAndRestart();
+  }
+
+  private lineBlocked(x1: number, y1: number, x2: number, y2: number): boolean {
+    return segmentHitsWall(x1, y1, x2, y2, this.wallRects, 20);
   }
 
   private showDeathAndRestart(): void {

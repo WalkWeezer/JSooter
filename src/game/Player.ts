@@ -53,12 +53,13 @@ export class PlayerActor {
   private attacking = false;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    this.underglow = scene.add.circle(x, y, 28, 0x2de2e6, 0.22).setDepth(19);
+    this.underglow = scene.add.circle(x, y, 26, 0x2de2e6, 0.22).setDepth(19);
     this.body = scene.physics.add.sprite(x, y, PLAYER_ANIM_SHEET, 0);
-    this.body.setCircle(14, 6, 6);
+    this.body.setDisplaySize(56, 56);
+    this.body.setSize(22, 22);
+    this.body.setOffset((this.body.width - 22) / 2, (this.body.height - 22) / 2);
     this.body.setCollideWorldBounds(true);
     this.body.setDepth(20);
-    this.body.setDisplaySize(68, 68);
     playAnim(this.body, 'player_idle', false);
 
     this.weaponSprite = scene.add.image(x, y, 'wpn_fist').setDepth(21).setDisplaySize(20, 20);

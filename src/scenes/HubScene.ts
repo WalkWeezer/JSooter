@@ -143,8 +143,27 @@ export class HubScene extends Phaser.Scene {
       this.scene.start('MissionSelectScene');
     });
 
+    const mobile = this.add
+      .text(width / 2, height * 0.735, t('hub.mobile_play'), {
+        fontFamily: 'monospace',
+        fontSize: '15px',
+        color: '#FFC857',
+        backgroundColor: '#1a1520',
+        padding: { x: 12, y: 7 },
+      })
+      .setOrigin(0.5)
+      .setDepth(3)
+      .setInteractive({ useHandCursor: true });
+    mobile.on('pointerdown', () => {
+      this.registry.set('forceTouchUi', true);
+      const url = new URL(window.location.href);
+      url.searchParams.set('mobile', '1');
+      window.history.replaceState({}, '', url.toString());
+      this.scene.start('MissionSelectScene');
+    });
+
     const shop = this.add
-      .text(width / 2, height * 0.78, t('shop.title'), {
+      .text(width / 2, height * 0.81, t('shop.title'), {
         fontFamily: 'monospace',
         fontSize: '16px',
         color: '#2DE2E6',
@@ -157,7 +176,7 @@ export class HubScene extends Phaser.Scene {
     shop.on('pointerdown', () => this.scene.start('ShopScene'));
 
     this.add
-      .text(width / 2, height * 0.88, t('hub.phase_note'), {
+      .text(width / 2, height * 0.9, t('hub.phase_note'), {
         fontFamily: 'monospace',
         fontSize: '12px',
         color: '#6b7385',
