@@ -1,0 +1,11 @@
+{PASTE MASTER.txt HERE}
+
+Produce a 32x32 top-down seamless tile atlas for PORT ZARYA-13 warehouse biome.
+Labeled rows:
+- metal floor panels, grate floor, hazard stripe floor (amber)
+- rack/shelf wall tiles, pipe wall, container wall
+- exit pad phosphor green
+Industrial cold lighting, same palette lock, readable silhouettes.
+Atlas PNG for Phaser.
+
+Negative: {PASTE NEGATIVE.txt HERE}

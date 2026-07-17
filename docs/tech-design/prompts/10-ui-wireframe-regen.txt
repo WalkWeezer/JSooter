@@ -1,0 +1,10 @@
+{PASTE MASTER.txt HERE}
+
+Flat PRODUCT DESIGN WIREFRAME (schematic, not photoreal) of Neontron pager UI.
+Portrait phone frame. Annotate with thin leader lines:
+sticky banner safe area, bezel, phosphor screen, brand lockup, mission row anatomy,
+risk badge, tab bar, footer.
+Colors: dark charcoal wireframe, annotation accents cyan/phosphor only.
+No decorative stickers. High clarity for engineering handoff.
+
+Negative: {PASTE NEGATIVE.txt HERE}

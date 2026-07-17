@@ -1,0 +1,11 @@
+{PASTE MASTER.txt HERE}
+
+Orthographic top-down LEVEL CONCEPT ART for mission {MISSION_ID} — {TITLE}.
+Biome: {BIOME_NAME}.
+Layout (must follow exactly): {LAYOUT_PARAGRAPH}.
+Show walls, door chokes, player (cyan outline) at spawn, enemies with magenta vision cones,
+case item if extract, EXIT phosphor pad, max 2 props for scale.
+English mono callouts: SPAWN, EXIT, CASE, CHOKE, FLANK ROUTE.
+Aspect 16:9. This is a tilemap design reference, NOT a collage of random screenshots.
+
+Negative: {PASTE NEGATIVE.txt HERE}

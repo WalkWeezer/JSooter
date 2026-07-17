@@ -1,0 +1,9 @@
+STYLE LOCK — Neontron: Night Assault
+Game: top-down neon synth-noir combat arcade, age rating 12+, stylized not realistic.
+Palette ONLY: #0B0D12 background, #2DE2E6 cyan, #FF2A6D magenta, #7A5CFF violet rare,
+#39FF14 phosphor UI green, #FFC857 amber warning/VIP.
+Art direction: retro-HD pixel / crisp game sprites, wet asphalt reflections, neon signage.
+Brand wordmark NEONTRON may appear as in-world neon sign (Latin).
+NO blood, NO gore, NO horror meat, NO children, NO political symbols, NO real brands.
+Readability first: clear silhouettes, honest vision cones (magenta translucent).
+Typography mood (for UI): geometric display for NEONTRON, clean tech sans for titles, monospace for codes.

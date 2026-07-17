@@ -1,0 +1,10 @@
+{PASTE MASTER.txt HERE}
+
+Produce a 32x32 top-down tile atlas for TRAINING DECK biome (tutorial chapter).
+Minimal, clean, teaching clarity:
+- simple dark matte floor
+- smooth walls with sparse cyan neon edge
+- exit pad phosphor green
+Very few props. Labeled atlas. Must feel emptier and clearer than Plat club.
+
+Negative: {PASTE NEGATIVE.txt HERE}

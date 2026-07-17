@@ -275,8 +275,9 @@
 
 ## 7. Арт, звук, тон
 
-> **Визуальные референсы:** см. пакет [docs/visual-style/](./visual-style/README.md)  
-> (key art, top-down геймплей, личины, dissolve VFX, UI пейджера, палитра)
+> **Визуальные референсы:**  
+> - Mood frames: [docs/visual-style/](./visual-style/README.md)  
+> - **Технический диздок LLM (вайрфреймы, биомы, промпты, Agent Cards):** [docs/tech-design/](./tech-design/README.md)
 
 ### 7.1. Визуальный язык
 
