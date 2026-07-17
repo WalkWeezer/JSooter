@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { t, getLang, onLangChange, setLang } from '../i18n';
 import { audioService } from '../audio/AudioService';
+import { mountPagerChrome, pagerButton, UI } from '../ui/PagerChrome';
 
 export class SettingsScene extends Phaser.Scene {
   private unsub: (() => void) | null = null;
@@ -11,7 +12,6 @@ export class SettingsScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#0B0D12');
     this.draw();
     this.unsub = onLangChange(() => this.draw());
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -22,98 +22,76 @@ export class SettingsScene extends Phaser.Scene {
 
   private draw(): void {
     this.children.removeAll();
-    const { width, height } = this.scale;
-    const pad = Number(this.registry.get('stickyPaddingPx') || 90);
     const lang = getLang();
-
-    this.add
-      .text(width / 2, pad + 40, t('settings.title'), {
-        fontFamily: 'monospace',
-        fontSize: '28px',
-        color: '#2DE2E6',
-      })
-      .setOrigin(0.5);
-
-    this.add
-      .text(width / 2, pad + 90, t('settings.language'), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#9aa3b5',
-      })
-      .setOrigin(0.5);
-
-    this.makeLangButton(width / 2 - 90, pad + 140, 'ru', t('settings.lang_ru'), lang === 'ru');
-    this.makeLangButton(width / 2 + 90, pad + 140, 'en', t('settings.lang_en'), lang === 'en');
-
-    const mute = this.add
-      .text(width / 2, pad + 200, `${t('settings.mute')}: ${this.userMuted ? t('common.on') : t('common.off')}`, {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#cfd6e6',
-        backgroundColor: '#121820',
-        padding: { x: 12, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    mute.on('pointerdown', () => {
-      this.userMuted = !this.userMuted;
-      audioService.setUserMuted(this.userMuted);
-      this.draw();
+    const layout = mountPagerChrome(this, {
+      activeTab: 'system',
+      title: t('settings.title'),
+      subtitle: t('pager.footer'),
     });
 
+    const cx = layout.content.x;
+    const top = layout.content.y - layout.content.h / 2;
+
     this.add
-      .text(width / 2, pad + 260, t('settings.cloud_save_reason'), {
-        fontFamily: 'monospace',
+      .text(cx, top + 8, t('settings.language'), {
+        fontFamily: UI.font,
+        fontSize: '11px',
+        color: UI.hex.muted,
+      })
+      .setOrigin(0.5, 0)
+      .setDepth(8);
+
+    pagerButton(this, cx - 70, top + 42, t('settings.lang_ru'), {
+      fill: lang === 'ru' ? UI.hex.cyan : '#152028',
+      color: lang === 'ru' ? UI.hex.bg : UI.hex.cyan,
+      fontSize: '13px',
+      onClick: () => {
+        setLang('ru');
+        this.registry.set('lang', 'ru');
+      },
+    });
+    pagerButton(this, cx + 70, top + 42, t('settings.lang_en'), {
+      fill: lang === 'en' ? UI.hex.cyan : '#152028',
+      color: lang === 'en' ? UI.hex.bg : UI.hex.cyan,
+      fontSize: '13px',
+      onClick: () => {
+        setLang('en');
+        this.registry.set('lang', 'en');
+      },
+    });
+
+    pagerButton(
+      this,
+      cx,
+      top + 90,
+      `${t('settings.mute')}: ${this.userMuted ? t('common.on') : t('common.off')}`,
+      {
+        fill: '#121820',
+        color: UI.hex.text,
         fontSize: '13px',
-        color: '#6b7385',
+        onClick: () => {
+          this.userMuted = !this.userMuted;
+          audioService.setUserMuted(this.userMuted);
+          this.draw();
+        },
+      },
+    );
+
+    this.add
+      .text(cx, top + 130, t('settings.cloud_save_reason'), {
+        fontFamily: UI.font,
+        fontSize: '10px',
+        color: UI.hex.muted,
         align: 'center',
-        wordWrap: { width: Math.min(420, width - 40) },
+        wordWrap: { width: layout.content.w - 20 },
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5, 0)
+      .setDepth(8);
 
-    const cloud = this.add
-      .text(width / 2, pad + 320, t('settings.cloud_save'), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#0B0D12',
-        backgroundColor: '#2DE2E6',
-        padding: { x: 14, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    cloud.on('pointerdown', () => {
-      console.info('[auth] cloud save requested — open Yandex auth on explicit tap');
-    });
-
-    const back = this.add
-      .text(width / 2, height - pad - 40, t('common.back'), {
-        fontFamily: 'monospace',
-        fontSize: '18px',
-        color: '#39FF14',
-        backgroundColor: '#152018',
-        padding: { x: 16, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    back.on('pointerdown', () => this.scene.start('HubScene'));
-  }
-
-  private makeLangButton(x: number, y: number, code: 'ru' | 'en', label: string, active: boolean): void {
-    const btn = this.add
-      .text(x, y, label, {
-        fontFamily: 'monospace',
-        fontSize: '18px',
-        color: active ? '#0B0D12' : '#2DE2E6',
-        backgroundColor: active ? '#2DE2E6' : '#152028',
-        padding: { x: 14, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    btn.on('pointerdown', () => {
-      setLang(code);
-      this.registry.set('lang', code);
+    pagerButton(this, cx, top + 175, t('settings.cloud_save'), {
+      fill: UI.hex.cyan,
+      color: UI.hex.bg,
+      onClick: () => console.info('[auth] cloud save requested — open Yandex auth on explicit tap'),
     });
   }
 }

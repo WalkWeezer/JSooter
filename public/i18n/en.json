@@ -22,6 +22,23 @@
     "mobile_play": "Mobile controls",
     "sticky_label": "sticky-safe-area"
   },
+  "pager": {
+    "tab_missions": "MISSIONS",
+    "tab_loadout": "LOADOUT",
+    "tab_intel": "INTEL",
+    "tab_system": "SYSTEM",
+    "night_assault": "NIGHT ASSAULT",
+    "tagline": "COVERT OPS. NOCTURNAL STRIKES.",
+    "risk": "RISK",
+    "locked": "// CLASSIFIED //",
+    "unlock_hint": "COMPLETE {{id}}",
+    "signal": "SIGNAL",
+    "signal_ok": "STABLE",
+    "district": "DISTRICT",
+    "footer": "NEONTRON SYSTEMS · NIGHT ASSAULT",
+    "contract": "CONTRACT",
+    "rank_log": "RESULT LOG"
+  },
   "briefing": {
     "title": "Contract",
     "start": "Start assault",

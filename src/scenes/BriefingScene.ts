@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { t } from '../i18n';
 import { getMission } from '../data/missionIndex';
 import type { MissionDef } from '../game/types';
+import { mountPagerChrome, pagerButton, pagerPanel, missionCode, districtLabel, UI } from '../ui/PagerChrome';
 
 export class BriefingScene extends Phaser.Scene {
   private missionId = 'tut_01';
@@ -16,81 +17,65 @@ export class BriefingScene extends Phaser.Scene {
 
   create(): void {
     const mission = getMission(this.missionId) as MissionDef;
-    const { width, height } = this.scale;
-    const pad = Number(this.registry.get('stickyPaddingPx') || 90);
+    const layout = mountPagerChrome(this, {
+      activeTab: 'missions',
+      title: t('pager.contract'),
+      subtitle: `${missionCode(this.missionId)} · ${districtLabel(this.missionId)}`,
+    });
 
-    this.cameras.main.setBackgroundColor('#0B0D12');
+    const cx = layout.content.x;
+    const top = layout.content.y - layout.content.h / 2;
+    const w = layout.content.w;
 
-    this.add
-      .text(width / 2, pad + 40, t('briefing.title'), {
-        fontFamily: 'monospace',
-        fontSize: '26px',
-        color: '#2DE2E6',
-      })
-      .setOrigin(0.5);
-
-    this.add
-      .text(width / 2, pad + 90, this.missionId.toUpperCase(), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#FF2A6D',
-      })
-      .setOrigin(0.5);
+    pagerPanel(this, cx, top + 48, w - 4, 70, 6);
 
     const bodyKey = `briefing.${this.missionId}_body`;
     const body = t(bodyKey);
     this.add
-      .text(width / 2, height * 0.38, body === bodyKey ? t('briefing.default_body') : body, {
-        fontFamily: 'monospace',
-        fontSize: '15px',
-        color: '#cfd6e6',
+      .text(cx, top + 48, body === bodyKey ? t('briefing.default_body') : body, {
+        fontFamily: UI.font,
+        fontSize: '12px',
+        color: UI.hex.text,
         align: 'center',
-        wordWrap: { width: Math.min(460, width - 40) },
-      })
-      .setOrigin(0.5);
-
-    const objectiveKey = `briefing.objective_${mission.objective === 'vip' ? 'vip' : mission.objective}`;
-    this.add
-      .text(width / 2, height * 0.52, t(objectiveKey), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#39FF14',
-      })
-      .setOrigin(0.5);
-
-    this.add
-      .text(width / 2, height * 0.58, t('briefing.s_hint', { sec: mission.sRankRules.maxTimeSec }), {
-        fontFamily: 'monospace',
-        fontSize: '13px',
-        color: '#6b7385',
-      })
-      .setOrigin(0.5);
-
-    const start = this.add
-      .text(width / 2, height * 0.72, t('briefing.start'), {
-        fontFamily: 'monospace',
-        fontSize: '20px',
-        color: '#0B0D12',
-        backgroundColor: '#2DE2E6',
-        padding: { x: 18, y: 12 },
+        wordWrap: { width: w - 24 },
       })
       .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
+      .setDepth(8);
 
-    start.on('pointerdown', () => {
-      this.registry.set('runDeaths', 0);
-      this.scene.start('MissionScene', { missionId: this.missionId });
+    const objectiveKey = `briefing.objective_${mission.objective}`;
+    this.add
+      .text(cx, top + 100, t(objectiveKey), {
+        fontFamily: UI.font,
+        fontSize: '13px',
+        color: UI.hex.green,
+      })
+      .setOrigin(0.5)
+      .setDepth(8);
+
+    this.add
+      .text(cx, top + 122, t('briefing.s_hint', { sec: mission.sRankRules.maxTimeSec }), {
+        fontFamily: UI.font,
+        fontSize: '10px',
+        color: UI.hex.muted,
+      })
+      .setOrigin(0.5)
+      .setDepth(8);
+
+    pagerButton(this, cx, top + 165, t('briefing.start'), {
+      fill: UI.hex.cyan,
+      color: UI.hex.bg,
+      fontSize: '15px',
+      onClick: () => {
+        this.registry.set('runDeaths', 0);
+        this.scene.start('MissionScene', { missionId: this.missionId });
+      },
     });
 
-    const back = this.add
-      .text(width / 2, height - pad - 30, t('common.back'), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#9aa3b5',
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    back.on('pointerdown', () => this.scene.start('MissionSelectScene'));
+    pagerButton(this, cx, top + 205, t('common.back'), {
+      fill: '#121820',
+      color: UI.hex.muted,
+      fontSize: '12px',
+      onClick: () => this.scene.start('MissionSelectScene'),
+    });
   }
 }

@@ -39,6 +39,7 @@ export const SPRITE_FILES: Record<string, string> = {
   neon_strip_c: 'assets/sprites/neon_strip_c.png',
   neon_strip_v: 'assets/sprites/neon_strip_v.png',
   hub_bg: 'assets/sprites/hub_bg.jpg',
+  pager_bezel: 'assets/ui/pager_bezel.jpg',
 };
 
 export function preloadGameSprites(scene: Phaser.Scene): void {

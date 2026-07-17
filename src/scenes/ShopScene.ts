@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
 import { saveService } from '../save/SaveService';
-import { MASKS, getMask } from '../data/masks';
+import { MASKS } from '../data/masks';
 import { purchaseService } from '../iap/PurchaseService';
-import { adsService } from '../ads/AdsService';
+import { mountPagerChrome, pagerButton, UI } from '../ui/PagerChrome';
 
 export class ShopScene extends Phaser.Scene {
   constructor() {
@@ -11,124 +11,94 @@ export class ShopScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#0B0D12');
     this.draw();
   }
 
   private draw(): void {
     this.children.removeAll();
-    const { width, height } = this.scale;
-    const pad = Number(this.registry.get('stickyPaddingPx') || 90);
     const save = saveService.get();
+    const layout = mountPagerChrome(this, {
+      activeTab: 'loadout',
+      title: t('shop.title'),
+      subtitle: `${t('shop.impulses', { count: save.impulses })} · ${t('shop.cassettes', { count: save.cassettes })}`,
+    });
 
-    this.add
-      .text(width / 2, pad + 28, t('shop.title'), {
-        fontFamily: 'monospace',
-        fontSize: '24px',
-        color: '#2DE2E6',
-      })
-      .setOrigin(0.5);
-
-    this.add
-      .text(
-        width / 2,
-        pad + 64,
-        `${t('shop.impulses', { count: save.impulses })}   ${t('shop.cassettes', { count: save.cassettes })}`,
-        { fontFamily: 'monospace', fontSize: '14px', color: '#9aa3b5' },
-      )
-      .setOrigin(0.5);
+    const left = layout.content.x - layout.content.w / 2;
+    const top = layout.content.y - layout.content.h / 2;
+    const w = layout.content.w;
 
     MASKS.forEach((mask, i) => {
-      const y = pad + 110 + i * 78;
+      const y = top + 14 + i * 52;
       const owned = save.unlockedMasks.includes(mask.id) || mask.costImpulses === 0;
       const equipped = save.maskId === mask.id;
-      const title = `${t(mask.nameKey)}${equipped ? ' ★' : ''}`;
+
+      const g = this.add.graphics().setDepth(6);
+      g.lineStyle(1, equipped ? UI.green : UI.cyan, 0.45);
+      g.strokeRect(left + 2, y, w - 4, 46);
+
       this.add
-        .text(40, y, title, { fontFamily: 'monospace', fontSize: '16px', color: '#cfd6e6' })
-        .setOrigin(0, 0.5);
-      this.add
-        .text(40, y + 22, t(mask.descKey), {
-          fontFamily: 'monospace',
+        .text(left + 10, y + 12, `${t(mask.nameKey)}${equipped ? ' ★' : ''}`, {
+          fontFamily: UI.font,
           fontSize: '12px',
-          color: '#6b7385',
-          wordWrap: { width: width - 200 },
+          color: UI.hex.text,
         })
-        .setOrigin(0, 0.5);
+        .setOrigin(0, 0.5)
+        .setDepth(7);
+      this.add
+        .text(left + 10, y + 30, t(mask.descKey), {
+          fontFamily: UI.font,
+          fontSize: '9px',
+          color: UI.hex.muted,
+          wordWrap: { width: w - 110 },
+        })
+        .setOrigin(0, 0.5)
+        .setDepth(7);
 
       if (owned) {
-        const eq = this.add
-          .text(width - 40, y, equipped ? t('shop.owned') : t('shop.equip'), {
-            fontFamily: 'monospace',
-            fontSize: '14px',
-            color: '#0B0D12',
-            backgroundColor: equipped ? '#39FF14' : '#2DE2E6',
-            padding: { x: 10, y: 6 },
-          })
-          .setOrigin(1, 0.5)
-          .setInteractive({ useHandCursor: true });
-        eq.on('pointerdown', () => {
-          saveService.equipMask(mask.id);
-          this.draw();
+        pagerButton(this, left + w - 48, y + 23, equipped ? t('shop.owned') : t('shop.equip'), {
+          fill: equipped ? UI.hex.green : UI.hex.cyan,
+          color: UI.hex.bg,
+          fontSize: '11px',
+          onClick: () => {
+            saveService.equipMask(mask.id);
+            this.draw();
+          },
         });
       } else {
-        const buy = this.add
-          .text(width - 40, y, `${t('shop.buy')} (${mask.costImpulses})`, {
-            fontFamily: 'monospace',
-            fontSize: '14px',
-            color: '#0B0D12',
-            backgroundColor: save.impulses >= mask.costImpulses ? '#FF2A6D' : '#333',
-            padding: { x: 10, y: 6 },
-          })
-          .setOrigin(1, 0.5)
-          .setInteractive({ useHandCursor: true });
-        buy.on('pointerdown', () => {
-          if (saveService.buyMask(mask.id, mask.costImpulses)) this.draw();
+        pagerButton(this, left + w - 52, y + 23, `${t('shop.buy')} ${mask.costImpulses}`, {
+          fill: save.impulses >= mask.costImpulses ? UI.hex.magenta : '#333',
+          color: UI.hex.bg,
+          fontSize: '10px',
+          onClick: () => {
+            if (saveService.buyMask(mask.id, mask.costImpulses)) this.draw();
+          },
         });
       }
     });
 
-    this.add
-      .text(width / 2, height - pad - 110, t('shop.remove_ads'), {
-        fontFamily: 'monospace',
-        fontSize: '13px',
-        color: save.removeAds ? '#39FF14' : '#cfd6e6',
-        backgroundColor: '#121820',
-        padding: { x: 10, y: 6 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true })
-      .on('pointerdown', async () => {
-        if (save.removeAds) return;
-        await purchaseService.purchase('remove_ads');
-        this.draw();
-      });
-
-    const pack = this.add
-      .text(width / 2, height - pad - 70, t('shop.pack_cassettes'), {
-        fontFamily: 'monospace',
-        fontSize: '13px',
-        color: '#cfd6e6',
-        backgroundColor: '#121820',
-        padding: { x: 10, y: 6 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    pack.on('pointerdown', async () => {
-      await purchaseService.purchase('cassettes_small');
-      this.draw();
+    const by = top + 14 + MASKS.length * 52 + 16;
+    pagerButton(this, layout.content.x, by, t('shop.remove_ads'), {
+      fill: save.removeAds ? '#152018' : '#121820',
+      color: save.removeAds ? UI.hex.green : UI.hex.text,
+      fontSize: '11px',
+      onClick: () => {
+        void (async () => {
+          if (save.removeAds) return;
+          await purchaseService.purchase('remove_ads');
+          this.draw();
+        })();
+      },
     });
-
-    const back = this.add
-      .text(width / 2, height - pad - 28, t('common.back'), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#9aa3b5',
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    back.on('pointerdown', () => this.scene.start('HubScene'));
-
-    void getMask;
-    void adsService;
+    pagerButton(this, layout.content.x, by + 36, t('shop.pack_cassettes'), {
+      fill: '#121820',
+      color: UI.hex.amber,
+      fontSize: '11px',
+      onClick: () => {
+        void (async () => {
+          await purchaseService.purchase('cassettes_small');
+          this.draw();
+        })();
+      },
+    });
   }
 }

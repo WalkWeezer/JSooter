@@ -4,6 +4,7 @@ import type { MissionResultPayload } from './MissionScene';
 import { saveService } from '../save/SaveService';
 import { getNextMissionId } from '../data/missionIndex';
 import { adsService } from '../ads/AdsService';
+import { mountPagerChrome, pagerButton, missionCode, UI } from '../ui/PagerChrome';
 
 export class ResultsScene extends Phaser.Scene {
   private payload!: MissionResultPayload;
@@ -17,120 +18,95 @@ export class ResultsScene extends Phaser.Scene {
   }
 
   async create(): Promise<void> {
-    const { width, height } = this.scale;
-    const pad = Number(this.registry.get('stickyPaddingPx') || 90);
     const p = this.payload;
     const nextId = getNextMissionId(p.missionId);
-
     saveService.markCleared(p.missionId, p.rank, p.timeSec, p.deaths, nextId);
     await adsService.showSticky();
 
-    this.cameras.main.setBackgroundColor('#0B0D12');
+    const layout = mountPagerChrome(this, {
+      activeTab: 'missions',
+      title: t('pager.rank_log'),
+      subtitle: missionCode(p.missionId),
+    });
+
+    const cx = layout.content.x;
+    const top = layout.content.y - layout.content.h / 2;
 
     this.add
-      .text(width / 2, pad + 50, t('results.title'), {
-        fontFamily: 'monospace',
-        fontSize: '26px',
-        color: '#2DE2E6',
+      .text(cx, top + 20, t('results.rank', { rank: p.rank }), {
+        fontFamily: UI.font,
+        fontSize: '36px',
+        color: p.rank.startsWith('S') ? UI.hex.green : UI.hex.magenta,
+        fontStyle: 'bold',
       })
-      .setOrigin(0.5);
-
-    this.add
-      .text(width / 2, height * 0.26, t('results.rank', { rank: p.rank }), {
-        fontFamily: 'monospace',
-        fontSize: '48px',
-        color: p.rank.startsWith('S') ? '#39FF14' : '#FF2A6D',
-      })
-      .setOrigin(0.5);
+      .setOrigin(0.5, 0)
+      .setDepth(8);
 
     this.add
       .text(
-        width / 2,
-        height * 0.4,
-        `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}\n${t('shop.impulses', { count: saveService.get().impulses })}`,
+        cx,
+        top + 70,
+        `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}\n${p.alarm ? t('mission.alarm') : t('pager.signal_ok')}\n${t('shop.impulses', { count: saveService.get().impulses })}`,
         {
-          fontFamily: 'monospace',
-          fontSize: '16px',
-          color: '#cfd6e6',
+          fontFamily: UI.font,
+          fontSize: '12px',
+          color: UI.hex.text,
           align: 'center',
         },
       )
-      .setOrigin(0.5);
-
-    const rv = this.add
-      .text(width / 2, height * 0.54, t('ads.reward_x2'), {
-        fontFamily: 'monospace',
-        fontSize: '14px',
-        color: '#0B0D12',
-        backgroundColor: '#FFC857',
-        padding: { x: 12, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    rv.on('pointerdown', async () => {
-      rv.disableInteractive();
-      const ok = await adsService.showRewarded();
-      if (ok) {
-        saveService.addImpulses(10);
-        rv.setText(t('shop.impulses', { count: saveService.get().impulses }));
-      } else {
-        rv.setInteractive({ useHandCursor: true });
-      }
-    });
+      .setOrigin(0.5, 0)
+      .setDepth(8);
 
     const goNext = async (target: () => void) => {
       await adsService.showInterstitial();
       target();
     };
 
+    let y = top + 145;
+    pagerButton(this, cx, y, t('ads.reward_x2'), {
+      fill: UI.hex.amber,
+      color: UI.hex.bg,
+      fontSize: '12px',
+      onClick: () => {
+        void (async () => {
+          const ok = await adsService.showRewarded();
+          if (ok) saveService.addImpulses(10);
+        })();
+      },
+    });
+    y += 40;
+
     if (nextId) {
-      const next = this.add
-        .text(width / 2, height * 0.64, t('results.next'), {
-          fontFamily: 'monospace',
-          fontSize: '18px',
-          color: '#0B0D12',
-          backgroundColor: '#2DE2E6',
-          padding: { x: 16, y: 10 },
-        })
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
-      next.on('pointerdown', () => {
-        void goNext(() => this.scene.start('BriefingScene', { missionId: nextId }));
+      pagerButton(this, cx, y, t('results.next'), {
+        fill: UI.hex.cyan,
+        color: UI.hex.bg,
+        onClick: () => {
+          void goNext(() => this.scene.start('BriefingScene', { missionId: nextId }));
+        },
       });
+      y += 40;
     }
 
-    const again = this.add
-      .text(width / 2, height * 0.74, t('mission.retry'), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#0B0D12',
-        backgroundColor: '#FF2A6D',
-        padding: { x: 14, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    again.on('pointerdown', () => {
-      void goNext(() => {
-        this.registry.set('runDeaths', 0);
-        this.scene.start('BriefingScene', { missionId: p.missionId });
-      });
+    pagerButton(this, cx, y, t('mission.retry'), {
+      fill: UI.hex.magenta,
+      color: UI.hex.bg,
+      fontSize: '13px',
+      onClick: () => {
+        void goNext(() => {
+          this.registry.set('runDeaths', 0);
+          this.scene.start('BriefingScene', { missionId: p.missionId });
+        });
+      },
     });
+    y += 38;
 
-    const hub = this.add
-      .text(width / 2, height * 0.84, t('results.to_hub'), {
-        fontFamily: 'monospace',
-        fontSize: '16px',
-        color: '#2DE2E6',
-        backgroundColor: '#121820',
-        padding: { x: 14, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    hub.on('pointerdown', () => {
-      void goNext(() => this.scene.start('HubScene'));
+    pagerButton(this, cx, y, t('results.to_hub'), {
+      fill: '#121820',
+      color: UI.hex.cyan,
+      fontSize: '12px',
+      onClick: () => {
+        void goNext(() => this.scene.start('HubScene'));
+      },
     });
   }
 }
