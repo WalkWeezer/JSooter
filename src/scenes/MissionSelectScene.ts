@@ -5,8 +5,10 @@ import { t } from '../i18n';
 import {
   mountPagerChrome,
   missionCode,
+  missionTitle,
   riskLabel,
   districtLabel,
+  uiText,
   UI,
 } from '../ui/PagerChrome';
 
@@ -38,80 +40,106 @@ export class MissionSelectScene extends Phaser.Scene {
 
     const left = layout.content.x - layout.content.w / 2;
     const top = layout.content.y - layout.content.h / 2;
-    const rowH = Math.min(46, (layout.content.h - 36) / this.pageSize);
+    const rowH = Math.min(52, (layout.content.h - 40) / this.pageSize);
     const rowW = layout.content.w;
 
     slice.forEach((m, i) => {
       const unlocked = saveService.isUnlocked(m.id);
       const cleared = saveService.get().cleared[m.id];
-      const y = top + 8 + i * rowH + rowH / 2;
+      const y = top + 6 + i * rowH + rowH / 2;
       const code = missionCode(m.id);
       const risk = riskLabel(m.id);
       const district = districtLabel(m.id);
+      const title = missionTitle(m.id);
 
       const g = this.add.graphics().setDepth(6);
-      g.lineStyle(1, unlocked ? UI.green : UI.muted, unlocked ? 0.7 : 0.35);
+      if (unlocked) {
+        g.fillStyle(0x0c1a12, 0.55);
+        g.fillRect(left + 2, y - rowH / 2 + 3, rowW - 4, rowH - 6);
+      }
+      g.lineStyle(1, unlocked ? UI.green : UI.muted, unlocked ? 0.55 : 0.28);
       g.strokeRect(left + 2, y - rowH / 2 + 3, rowW - 4, rowH - 6);
 
-      const titleColor = !unlocked ? UI.hex.dim : cleared ? UI.hex.green : UI.hex.text;
-      this.add
-        .text(left + 10, y - 8, code, {
-          fontFamily: UI.font,
-          fontSize: '10px',
-          color: unlocked ? UI.hex.cyan : UI.hex.dim,
-        })
-        .setOrigin(0, 0.5)
-        .setDepth(7);
+      // Status pips (cleared / locked)
+      const pipX = left + 12;
+      const pipY = y - 10;
+      for (let p = 0; p < 4; p++) {
+        const on = unlocked && cleared && p < 2;
+        g.fillStyle(on ? UI.green : unlocked ? 0x1a2a1e : 0x1a1a1a, 1);
+        g.fillRect(pipX + p * 7, pipY, 5, 5);
+      }
 
-      this.add
-        .text(left + 10, y + 8, unlocked ? district : t('pager.locked'), {
-          fontFamily: UI.font,
-          fontSize: '9px',
-          color: unlocked ? UI.hex.muted : UI.hex.dim,
-        })
-        .setOrigin(0, 0.5)
-        .setDepth(7);
+      uiText(this, left + 12, y + 6, code, {
+        family: 'mono',
+        size: 11,
+        color: unlocked ? UI.hex.cyan : UI.hex.dim,
+        originY: 0.5,
+        depth: 7,
+      });
 
-      const midLabel = unlocked
-        ? `${m.id.toUpperCase()}${cleared ? `  [${cleared.rank}]` : ''}`
-        : t('pager.unlock_hint', { id: missionCode(prevId(m.id)) });
-
-      this.add
-        .text(layout.content.x - 10, y, midLabel, {
-          fontFamily: UI.font,
-          fontSize: '11px',
-          color: titleColor,
-        })
-        .setOrigin(0.5)
-        .setDepth(7);
+      if (unlocked) {
+        uiText(this, left + 78, y - 8, title, {
+          family: 'ui',
+          size: 14,
+          color: cleared ? UI.hex.green : UI.hex.text,
+          bold: true,
+          originY: 0.5,
+          depth: 7,
+          glow: cleared ? 'green' : 'none',
+        });
+        uiText(this, left + 78, y + 10, district, {
+          family: 'mono',
+          size: 10,
+          color: UI.hex.muted,
+          originY: 0.5,
+          depth: 7,
+        });
+      } else {
+        uiText(this, left + 78, y - 6, t('pager.locked'), {
+          family: 'mono',
+          size: 12,
+          color: UI.hex.dim,
+          originY: 0.5,
+          depth: 7,
+        });
+        uiText(this, left + 78, y + 10, t('pager.unlock_hint', { id: missionCode(prevId(m.id)) }), {
+          family: 'mono',
+          size: 10,
+          color: UI.hex.dim,
+          originY: 0.5,
+          depth: 7,
+        });
+      }
 
       const riskColor =
         risk === 'CRITICAL' ? UI.hex.magenta : risk === 'HIGH' ? UI.hex.amber : UI.hex.green;
-      this.add
-        .text(left + rowW - 28, y - 6, `${t('pager.risk')}`, {
-          fontFamily: UI.font,
-          fontSize: '8px',
-          color: UI.hex.dim,
-        })
-        .setOrigin(1, 0.5)
-        .setDepth(7);
-      this.add
-        .text(left + rowW - 28, y + 8, unlocked ? risk : '—', {
-          fontFamily: UI.font,
-          fontSize: '10px',
-          color: unlocked ? riskColor : UI.hex.dim,
-        })
-        .setOrigin(1, 0.5)
-        .setDepth(7);
+      uiText(this, left + rowW - 28, y - 8, t('pager.risk'), {
+        family: 'mono',
+        size: 9,
+        color: UI.hex.dim,
+        originX: 1,
+        originY: 0.5,
+        depth: 7,
+      });
+      uiText(this, left + rowW - 28, y + 8, unlocked ? risk : '—', {
+        family: 'ui',
+        size: 12,
+        color: unlocked ? riskColor : UI.hex.dim,
+        bold: true,
+        originX: 1,
+        originY: 0.5,
+        depth: 7,
+        glow: unlocked && risk === 'CRITICAL' ? 'magenta' : 'none',
+      });
 
-      this.add
-        .text(left + rowW - 10, y, '>', {
-          fontFamily: UI.font,
-          fontSize: '14px',
-          color: unlocked ? UI.hex.green : UI.hex.dim,
-        })
-        .setOrigin(0.5)
-        .setDepth(7);
+      uiText(this, left + rowW - 10, y, '›', {
+        family: 'ui',
+        size: 22,
+        color: unlocked ? UI.hex.green : UI.hex.dim,
+        originX: 0.5,
+        originY: 0.5,
+        depth: 7,
+      });
 
       if (unlocked) {
         const hit = this.add
@@ -122,16 +150,15 @@ export class MissionSelectScene extends Phaser.Scene {
       }
     });
 
-    // Pagination
-    const py = layout.content.y + layout.content.h / 2 - 14;
-    const prev = this.add
-      .text(layout.content.x - 50, py, '▲', {
-        fontFamily: UI.font,
-        fontSize: '12px',
-        color: this.page > 0 ? UI.hex.green : UI.hex.dim,
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
+    const py = layout.content.y + layout.content.h / 2 - 16;
+    const prev = uiText(this, layout.content.x - 56, py, '▲', {
+      family: 'ui',
+      size: 14,
+      color: this.page > 0 ? UI.hex.green : UI.hex.dim,
+      originX: 0.5,
+      originY: 0.5,
+      depth: 8,
+    });
     if (this.page > 0) {
       prev.setInteractive({ useHandCursor: true });
       prev.on('pointerdown', () => {
@@ -140,23 +167,29 @@ export class MissionSelectScene extends Phaser.Scene {
       });
     }
 
-    this.add
-      .text(layout.content.x, py, `${String(this.page + 1).padStart(2, '0')} / ${String(pages).padStart(2, '0')}`, {
-        fontFamily: UI.font,
-        fontSize: '11px',
+    uiText(
+      this,
+      layout.content.x,
+      py,
+      `${String(this.page + 1).padStart(2, '0')} / ${String(pages).padStart(2, '0')}`,
+      {
+        family: 'mono',
+        size: 13,
         color: UI.hex.cyan,
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
+        originX: 0.5,
+        originY: 0.5,
+        depth: 8,
+      },
+    );
 
-    const next = this.add
-      .text(layout.content.x + 50, py, '▼', {
-        fontFamily: UI.font,
-        fontSize: '12px',
-        color: this.page < pages - 1 ? UI.hex.green : UI.hex.dim,
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
+    const next = uiText(this, layout.content.x + 56, py, '▼', {
+      family: 'ui',
+      size: 14,
+      color: this.page < pages - 1 ? UI.hex.green : UI.hex.dim,
+      originX: 0.5,
+      originY: 0.5,
+      depth: 8,
+    });
     if (this.page < pages - 1) {
       next.setInteractive({ useHandCursor: true });
       next.on('pointerdown', () => {

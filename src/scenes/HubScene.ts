@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { audioService } from '../audio/AudioService';
 import { markGameReady, getPlatform } from '../platform/yandex';
 import { t, getLang, onLangChange } from '../i18n';
-import { mountPagerChrome, pagerButton, UI } from '../ui/PagerChrome';
+import { mountPagerChrome, pagerButton, uiText, UI } from '../ui/PagerChrome';
 import { saveService } from '../save/SaveService';
 
 /** INTEL tab — signal status / entry into the pager. */
@@ -45,64 +45,63 @@ export class HubScene extends Phaser.Scene {
 
     const cx = layout.content.x;
     const top = layout.content.y - layout.content.h / 2;
-    const w = layout.content.w;
 
-    this.add
-      .text(cx, top + 8, t('pager.signal'), {
-        fontFamily: UI.font,
-        fontSize: '11px',
-        color: UI.hex.muted,
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(this, cx, top + 10, t('pager.signal'), {
+      family: 'mono',
+      size: 12,
+      color: UI.hex.muted,
+      originX: 0.5,
+    });
 
-    this.add
-      .text(cx, top + 28, t('pager.signal_ok'), {
-        fontFamily: UI.font,
-        fontSize: '22px',
-        color: UI.hex.green,
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(this, cx, top + 32, t('pager.signal_ok'), {
+      family: 'ui',
+      size: 28,
+      color: UI.hex.green,
+      bold: true,
+      originX: 0.5,
+      glow: 'green',
+    });
 
-    this.add
-      .text(
-        cx,
-        top + 62,
-        t('hub.status', { lang, sdk: isMock ? 'mock' : 'yandex' }),
-        { fontFamily: UI.font, fontSize: '11px', color: UI.hex.cyan },
-      )
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(this, cx, top + 72, t('hub.status', { lang, sdk: isMock ? 'mock' : 'yandex' }), {
+      family: 'mono',
+      size: 12,
+      color: UI.hex.cyan,
+      originX: 0.5,
+    });
 
-    this.add
-      .text(
-        cx,
-        top + 88,
-        `${t('shop.impulses', { count: save.impulses })}  ·  ${t('shop.cassettes', { count: save.cassettes })}`,
-        { fontFamily: UI.font, fontSize: '12px', color: UI.hex.amber },
-      )
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(
+      this,
+      cx,
+      top + 98,
+      `${t('shop.impulses', { count: save.impulses })}  ·  ${t('shop.cassettes', { count: save.cassettes })}`,
+      {
+        family: 'mono',
+        size: 13,
+        color: UI.hex.amber,
+        originX: 0.5,
+      },
+    );
 
-    pagerButton(this, cx, top + 130, t('hub.open_missions'), {
+    pagerButton(this, cx, top + 145, t('hub.open_missions'), {
       fill: UI.hex.green,
       color: UI.hex.bg,
+      fontSize: '16px',
       onClick: () => this.scene.start('MissionSelectScene'),
     });
 
-    pagerButton(this, cx, top + 175, isMock ? t('hub.cta_hum') : t('hub.cta_ready'), {
-      fill: '#152018',
-      color: UI.hex.green,
-      fontSize: '12px',
+    pagerButton(this, cx, top + 195, isMock ? t('hub.cta_hum') : t('hub.cta_ready'), {
+      fill: UI.hex.cyan,
+      color: UI.hex.bg,
+      fontSize: '13px',
+      outlined: true,
       onClick: () => audioService.playHubHum(),
     });
 
-    pagerButton(this, cx, top + 215, t('hub.mobile_play'), {
-      fill: '#1a1520',
-      color: UI.hex.amber,
-      fontSize: '12px',
+    pagerButton(this, cx, top + 240, t('hub.mobile_play'), {
+      fill: UI.hex.amber,
+      color: UI.hex.bg,
+      fontSize: '13px',
+      outlined: true,
       onClick: () => {
         this.registry.set('forceTouchUi', true);
         const url = new URL(window.location.href);
@@ -112,15 +111,12 @@ export class HubScene extends Phaser.Scene {
       },
     });
 
-    this.add
-      .text(cx, layout.content.y + layout.content.h / 2 - 18, t('pager.footer'), {
-        fontFamily: UI.font,
-        fontSize: '8px',
-        color: UI.hex.dim,
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
-
-    void w;
+    uiText(this, cx, layout.content.y + layout.content.h / 2 - 18, t('pager.footer'), {
+      family: 'mono',
+      size: 9,
+      color: UI.hex.dim,
+      originX: 0.5,
+      originY: 0.5,
+    });
   }
 }

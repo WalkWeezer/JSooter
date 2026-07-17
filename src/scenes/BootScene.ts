@@ -15,7 +15,7 @@ export class BootScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#0B0D12');
     const label = this.add
       .text(this.scale.width / 2, this.scale.height / 2, '…', {
-        fontFamily: 'monospace',
+        fontFamily: '"Exo 2", sans-serif',
         fontSize: '16px',
         color: '#2DE2E6',
       })

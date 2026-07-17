@@ -18,11 +18,18 @@ export const UI = {
     violet: '#7A5CFF',
     green: '#39FF14',
     amber: '#FFC857',
-    muted: '#6b7385',
-    text: '#cfd6e6',
-    dim: '#4a5160',
+    muted: '#8b93a7',
+    text: '#e8eef8',
+    dim: '#5a6478',
   },
-  font: 'Courier New, monospace',
+  /** Brand / neon sign (Latin NEONTRON) */
+  fontDisplay: 'Orbitron, "Exo 2", sans-serif',
+  /** Readable UI titles & body (Cyrillic) */
+  fontUi: '"Exo 2", sans-serif',
+  /** Codes, risk, timestamps */
+  fontMono: '"JetBrains Mono", monospace',
+  /** @deprecated use fontUi — kept for gradual migration */
+  font: '"Exo 2", sans-serif',
 } as const;
 
 export type PagerTab = 'missions' | 'loadout' | 'intel' | 'system';
@@ -34,6 +41,50 @@ export type PagerLayout = {
   content: { x: number; y: number; w: number; h: number };
   tabY: number;
 };
+
+type Glow = 'cyan' | 'green' | 'magenta' | 'none';
+
+export function uiText(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  content: string,
+  opts: {
+    family?: 'display' | 'ui' | 'mono';
+    size?: number | string;
+    color?: string;
+    bold?: boolean;
+    align?: 'left' | 'center' | 'right';
+    originX?: number;
+    originY?: number;
+    wrap?: number;
+    depth?: number;
+    glow?: Glow;
+    letterSpacing?: number;
+  } = {},
+): Phaser.GameObjects.Text {
+  const family =
+    opts.family === 'display' ? UI.fontDisplay : opts.family === 'mono' ? UI.fontMono : UI.fontUi;
+  const size = typeof opts.size === 'number' ? `${opts.size}px` : opts.size || '14px';
+  const text = scene.add
+    .text(x, y, content, {
+      fontFamily: family,
+      fontSize: size,
+      color: opts.color || UI.hex.text,
+      fontStyle: opts.bold ? 'bold' : 'normal',
+      align: opts.align || 'left',
+      wordWrap: opts.wrap ? { width: opts.wrap } : undefined,
+    })
+    .setOrigin(opts.originX ?? 0, opts.originY ?? 0)
+    .setDepth(opts.depth ?? 8);
+
+  const glow = opts.glow ?? 'none';
+  if (glow === 'cyan') text.setShadow(0, 0, '#2DE2E6', 10, true, true);
+  else if (glow === 'green') text.setShadow(0, 0, '#39FF14', 8, true, true);
+  else if (glow === 'magenta') text.setShadow(0, 0, '#FF2A6D', 10, true, true);
+
+  return text;
+}
 
 /**
  * Draws the Neontron pager chrome from the GDD ref:
@@ -50,7 +101,6 @@ export function mountPagerChrome(
 
   scene.cameras.main.setBackgroundColor(UI.hex.bg);
 
-  // City blur behind device
   if (scene.textures.exists('hub_bg')) {
     scene.add
       .image(width / 2, height / 2, 'hub_bg')
@@ -60,12 +110,11 @@ export function mountPagerChrome(
   }
   scene.add.rectangle(width / 2, height / 2, width, height, UI.bg, 0.55).setDepth(1);
 
-  // Device frame
   const marginX = Math.max(10, width * 0.04);
   const frameX = width / 2;
   const frameY = (padTop + (height - padBottom)) / 2;
-  const frameW = Math.min(width - marginX * 2, 420);
-  const frameH = Math.min(height - padTop - padBottom - 8, height * 0.82);
+  const frameW = Math.min(width - marginX * 2, 440);
+  const frameH = Math.min(height - padTop - padBottom - 8, height * 0.84);
 
   if (scene.textures.exists('pager_bezel')) {
     scene.add
@@ -81,7 +130,6 @@ export function mountPagerChrome(
     g.strokeRoundedRect(frameX - frameW / 2, frameY - frameH / 2, frameW, frameH, 18);
   }
 
-  // Inner phosphor screen
   const inset = Math.max(18, frameW * 0.07);
   const screenW = frameW - inset * 2;
   const screenH = frameH - inset * 2.2;
@@ -91,100 +139,101 @@ export function mountPagerChrome(
   const screenTop = screenY - screenH / 2;
 
   const screen = scene.add.graphics().setDepth(3);
-  screen.fillStyle(0x050806, 0.96);
+  screen.fillStyle(0x050806, 0.97);
   screen.fillRoundedRect(screenLeft, screenTop, screenW, screenH, 8);
-  screen.lineStyle(1, UI.green, 0.45);
+  screen.lineStyle(1, UI.green, 0.4);
   screen.strokeRoundedRect(screenLeft, screenTop, screenW, screenH, 8);
 
-  // Scanlines
-  const lines = scene.add.graphics().setDepth(4).setAlpha(0.07);
+  // Soft inner vignette
+  const vig = scene.add.graphics().setDepth(3).setAlpha(0.35);
+  vig.fillStyle(0x000000, 1);
+  vig.fillRect(screenLeft, screenTop, screenW, 18);
+  vig.fillRect(screenLeft, screenTop + screenH - 56, screenW, 56);
+
+  const lines = scene.add.graphics().setDepth(4).setAlpha(0.055);
   for (let y = 0; y < screenH; y += 3) {
     lines.lineStyle(1, UI.green, 1);
     lines.lineBetween(screenLeft, screenTop + y, screenLeft + screenW, screenTop + y);
   }
 
-  // Header brand
-  scene.add
-    .text(screenX, screenTop + 16, 'NEONTRON', {
-      fontFamily: UI.font,
-      fontSize: `${Math.min(26, screenW * 0.09)}px`,
-      color: UI.hex.cyan,
-      fontStyle: 'bold',
-    })
-    .setOrigin(0.5, 0)
-    .setDepth(5);
+  // Brand — hero-level signal matching key art / pager mock
+  const brandSize = Math.min(30, Math.floor(screenW * 0.095));
+  uiText(scene, screenX, screenTop + 14, 'NEONTRON', {
+    family: 'display',
+    size: brandSize,
+    color: UI.hex.cyan,
+    bold: true,
+    originX: 0.5,
+    glow: 'cyan',
+    depth: 5,
+  });
 
-  scene.add
-    .text(screenLeft + 10, screenTop + 42, '// NIGHT ASSAULT PROTOCOL', {
-      fontFamily: UI.font,
-      fontSize: '9px',
-      color: UI.hex.green,
-    })
-    .setDepth(5);
+  uiText(scene, screenLeft + 12, screenTop + 48, '// NIGHT ASSAULT PROTOCOL', {
+    family: 'mono',
+    size: 10,
+    color: UI.hex.muted,
+    depth: 5,
+  });
+  uiText(scene, screenLeft + screenW - 12, screenTop + 48, 'v0.1', {
+    family: 'mono',
+    size: 10,
+    color: UI.hex.dim,
+    originX: 1,
+    depth: 5,
+  });
 
-  scene.add
-    .text(screenLeft + screenW - 10, screenTop + 42, 'v0.1', {
-      fontFamily: UI.font,
-      fontSize: '9px',
-      color: UI.hex.dim,
-    })
-    .setOrigin(1, 0)
-    .setDepth(5);
-
-  // Header rule
   const rule = scene.add.graphics().setDepth(5);
-  rule.lineStyle(1, UI.green, 0.55);
-  rule.lineBetween(screenLeft + 8, screenTop + 56, screenLeft + screenW - 8, screenTop + 56);
+  rule.lineStyle(1, UI.green, 0.45);
+  rule.lineBetween(screenLeft + 10, screenTop + 66, screenLeft + screenW - 10, screenTop + 66);
 
+  let headerBottom = screenTop + 74;
   if (opts.title) {
-    scene.add
-      .text(screenX, screenTop + 64, opts.title, {
-        fontFamily: UI.font,
-        fontSize: '13px',
-        color: UI.hex.green,
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(5);
+    uiText(scene, screenX, headerBottom, opts.title, {
+      family: 'ui',
+      size: Math.min(20, Math.floor(screenW * 0.055)),
+      color: UI.hex.green,
+      bold: true,
+      originX: 0.5,
+      glow: 'green',
+      depth: 5,
+    });
+    headerBottom += 26;
   }
   if (opts.subtitle) {
-    scene.add
-      .text(screenX, screenTop + 80, opts.subtitle, {
-        fontFamily: UI.font,
-        fontSize: '10px',
-        color: UI.hex.muted,
-        align: 'center',
-        wordWrap: { width: screenW - 24 },
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(5);
+    uiText(scene, screenX, headerBottom, opts.subtitle, {
+      family: 'mono',
+      size: 11,
+      color: UI.hex.muted,
+      originX: 0.5,
+      align: 'center',
+      wrap: screenW - 28,
+      depth: 5,
+    });
+    headerBottom += 28;
   }
 
-  const contentTop = screenTop + (opts.subtitle ? 98 : opts.title ? 86 : 64);
-  const tabH = 48;
-  const contentH = screenH - (contentTop - screenTop) - tabH - 8;
-  const tabY = screenTop + screenH - tabH + 4;
+  const contentTop = headerBottom + 4;
+  const tabH = 56;
+  const contentH = screenH - (contentTop - screenTop) - tabH - 6;
+  const tabY = screenTop + screenH - tabH + 2;
 
   drawPagerTabs(scene, {
     active: opts.activeTab,
     x: screenLeft,
     y: tabY,
     w: screenW,
-    h: tabH - 6,
+    h: tabH - 4,
   });
 
-  // Sticky labels (dev/safe area)
-  scene.add
-    .rectangle(width / 2, sticky / 2, width, sticky, 0x11151f, 0.35)
-    .setDepth(20);
-  scene.add
-    .text(width / 2, sticky / 2, t('hub.sticky_label'), {
-      fontFamily: UI.font,
-      fontSize: '10px',
-      color: '#5a6478',
-    })
-    .setOrigin(0.5)
-    .setDepth(21);
+  scene.add.rectangle(width / 2, sticky / 2, width, sticky, 0x11151f, 0.35).setDepth(20);
+  uiText(scene, width / 2, sticky / 2, t('hub.sticky_label'), {
+    family: 'mono',
+    size: 10,
+    color: '#5a6478',
+    originX: 0.5,
+    originY: 0.5,
+    depth: 21,
+  });
 
   return {
     padTop,
@@ -193,7 +242,7 @@ export function mountPagerChrome(
     content: {
       x: screenX,
       y: contentTop + contentH / 2,
-      w: screenW - 16,
+      w: screenW - 20,
       h: contentH,
     },
     tabY,
@@ -204,42 +253,59 @@ function drawPagerTabs(
   scene: Phaser.Scene,
   box: { active: PagerTab; x: number; y: number; w: number; h: number },
 ): void {
-  const tabs: { id: PagerTab; labelKey: string; sceneKey: string }[] = [
-    { id: 'missions', labelKey: 'pager.tab_missions', sceneKey: 'MissionSelectScene' },
-    { id: 'loadout', labelKey: 'pager.tab_loadout', sceneKey: 'ShopScene' },
-    { id: 'intel', labelKey: 'pager.tab_intel', sceneKey: 'HubScene' },
-    { id: 'system', labelKey: 'pager.tab_system', sceneKey: 'SettingsScene' },
+  const tabs: { id: PagerTab; labelKey: string; sceneKey: string; icon: string }[] = [
+    { id: 'missions', labelKey: 'pager.tab_missions', sceneKey: 'MissionSelectScene', icon: '◎' },
+    { id: 'loadout', labelKey: 'pager.tab_loadout', sceneKey: 'ShopScene', icon: '▣' },
+    { id: 'intel', labelKey: 'pager.tab_intel', sceneKey: 'HubScene', icon: '☰' },
+    { id: 'system', labelKey: 'pager.tab_system', sceneKey: 'SettingsScene', icon: '⚙' },
   ];
   const cellW = box.w / tabs.length;
   const g = scene.add.graphics().setDepth(6);
-  g.lineStyle(1, UI.green, 0.35);
-  g.lineBetween(box.x + 6, box.y, box.x + box.w - 6, box.y);
+  g.lineStyle(1, UI.green, 0.3);
+  g.lineBetween(box.x + 8, box.y, box.x + box.w - 8, box.y);
 
   tabs.forEach((tab, i) => {
     const cx = box.x + cellW * (i + 0.5);
     const active = tab.id === box.active;
     if (active) {
-      g.lineStyle(1, UI.green, 0.8);
-      g.strokeRect(cx - cellW * 0.4, box.y + 6, cellW * 0.8, box.h - 10);
-      // caret
+      g.fillStyle(UI.green, 0.12);
+      g.fillRoundedRect(cx - cellW * 0.42, box.y + 6, cellW * 0.84, box.h - 10, 4);
+      g.lineStyle(1.5, UI.green, 0.9);
+      g.strokeRoundedRect(cx - cellW * 0.42, box.y + 6, cellW * 0.84, box.h - 10, 4);
       g.fillStyle(UI.green, 1);
-      g.fillTriangle(cx - 4, box.y + 2, cx + 4, box.y + 2, cx, box.y - 3);
+      g.fillTriangle(cx - 5, box.y + 3, cx + 5, box.y + 3, cx, box.y - 3);
     }
-    const label = scene.add
-      .text(cx, box.y + box.h / 2 + 2, t(tab.labelKey), {
-        fontFamily: UI.font,
-        fontSize: '9px',
-        color: active ? UI.hex.green : UI.hex.dim,
-        align: 'center',
-      })
-      .setOrigin(0.5)
+
+    uiText(scene, cx, box.y + 16, tab.icon, {
+      family: 'ui',
+      size: 13,
+      color: active ? UI.hex.green : UI.hex.dim,
+      originX: 0.5,
+      glow: active ? 'green' : 'none',
+      depth: 7,
+    });
+
+    const label = uiText(scene, cx, box.y + box.h - 14, t(tab.labelKey), {
+      family: 'ui',
+      size: 10,
+      color: active ? UI.hex.green : UI.hex.dim,
+      bold: active,
+      originX: 0.5,
+      originY: 0.5,
+      depth: 7,
+    }).setInteractive({ useHandCursor: true });
+
+    // Larger hit area
+    const hit = scene.add
+      .rectangle(cx, box.y + box.h / 2, cellW * 0.9, box.h - 4, 0x39ff14, 0.001)
       .setDepth(7)
       .setInteractive({ useHandCursor: true });
-
-    label.on('pointerdown', () => {
+    const go = () => {
       if (tab.id === box.active) return;
       scene.scene.start(tab.sceneKey);
-    });
+    };
+    label.on('pointerdown', go);
+    hit.on('pointerdown', go);
   });
 }
 
@@ -252,17 +318,18 @@ export function pagerPanel(
   depth = 5,
 ): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics().setDepth(depth);
-  g.lineStyle(1, UI.green, 0.55);
+  g.fillStyle(0x08140c, 0.55);
+  g.fillRect(x - w / 2, y - h / 2, w, h);
+  g.lineStyle(1, UI.green, 0.5);
   g.strokeRect(x - w / 2, y - h / 2, w, h);
-  // corner crosses
-  const c = 5;
+  const c = 6;
   const corners = [
     [x - w / 2, y - h / 2],
     [x + w / 2, y - h / 2],
     [x - w / 2, y + h / 2],
     [x + w / 2, y + h / 2],
   ];
-  g.lineStyle(1, UI.cyan, 0.7);
+  g.lineStyle(1.5, UI.cyan, 0.75);
   for (const [cx, cy] of corners) {
     g.lineBetween(cx - c, cy, cx + c, cy);
     g.lineBetween(cx, cy - c, cx, cy + c);
@@ -280,22 +347,32 @@ export function pagerButton(
     fill?: string;
     fontSize?: string;
     depth?: number;
+    outlined?: boolean;
     onClick: () => void;
   },
 ): Phaser.GameObjects.Text {
+  const outlined = opts.outlined ?? false;
+  const accent = opts.fill || UI.hex.cyan;
+  const color = outlined ? accent : opts.color || UI.hex.bg;
   const btn = scene.add
-    .text(x, y, label, {
-      fontFamily: UI.font,
-      fontSize: opts.fontSize || '14px',
-      color: opts.color || UI.hex.bg,
-      backgroundColor: opts.fill || UI.hex.cyan,
-      padding: { x: 14, y: 8 },
+    .text(x, y, label.toUpperCase(), {
+      fontFamily: UI.fontUi,
+      fontSize: opts.fontSize || '15px',
+      color,
+      backgroundColor: outlined ? '#0a120e' : accent,
+      padding: { x: 16, y: 10 },
+      fontStyle: 'bold',
     })
     .setOrigin(0.5)
     .setDepth(opts.depth ?? 8)
     .setInteractive({ useHandCursor: true });
+
+  if (outlined) {
+    btn.setStroke(accent, 1);
+  }
+
   btn.on('pointerdown', opts.onClick);
-  btn.on('pointerover', () => btn.setAlpha(0.85));
+  btn.on('pointerover', () => btn.setAlpha(0.88));
   btn.on('pointerout', () => btn.setAlpha(1));
   return btn;
 }
@@ -305,6 +382,12 @@ export function missionCode(id: string): string {
   if (!m) return id.toUpperCase();
   const prefix = m[1].toLowerCase() === 'tut' ? 'NA-T' : m[1].toLowerCase() === 'plat' ? 'NA' : 'NP';
   return `${prefix}-${m[2].padStart(2, '0')}`;
+}
+
+export function missionTitle(id: string): string {
+  const key = `missions.${id}_name`;
+  const value = t(key);
+  return value === key ? id.toUpperCase() : value;
 }
 
 export function riskLabel(id: string): string {

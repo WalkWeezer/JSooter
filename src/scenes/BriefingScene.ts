@@ -2,7 +2,16 @@ import Phaser from 'phaser';
 import { t } from '../i18n';
 import { getMission } from '../data/missionIndex';
 import type { MissionDef } from '../game/types';
-import { mountPagerChrome, pagerButton, pagerPanel, missionCode, districtLabel, UI } from '../ui/PagerChrome';
+import {
+  mountPagerChrome,
+  pagerButton,
+  pagerPanel,
+  missionCode,
+  missionTitle,
+  districtLabel,
+  uiText,
+  UI,
+} from '../ui/PagerChrome';
 
 export class BriefingScene extends Phaser.Scene {
   private missionId = 'tut_01';
@@ -27,54 +36,61 @@ export class BriefingScene extends Phaser.Scene {
     const top = layout.content.y - layout.content.h / 2;
     const w = layout.content.w;
 
-    pagerPanel(this, cx, top + 48, w - 4, 70, 6);
+    uiText(this, cx, top + 6, missionTitle(this.missionId), {
+      family: 'ui',
+      size: 18,
+      color: UI.hex.text,
+      bold: true,
+      originX: 0.5,
+      glow: 'cyan',
+    });
+
+    pagerPanel(this, cx, top + 68, w - 4, 78, 6);
 
     const bodyKey = `briefing.${this.missionId}_body`;
     const body = t(bodyKey);
-    this.add
-      .text(cx, top + 48, body === bodyKey ? t('briefing.default_body') : body, {
-        fontFamily: UI.font,
-        fontSize: '12px',
-        color: UI.hex.text,
-        align: 'center',
-        wordWrap: { width: w - 24 },
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
+    uiText(this, cx, top + 68, body === bodyKey ? t('briefing.default_body') : body, {
+      family: 'ui',
+      size: 14,
+      color: UI.hex.text,
+      originX: 0.5,
+      originY: 0.5,
+      align: 'center',
+      wrap: w - 28,
+    });
 
     const objectiveKey = `briefing.objective_${mission.objective}`;
-    this.add
-      .text(cx, top + 100, t(objectiveKey), {
-        fontFamily: UI.font,
-        fontSize: '13px',
-        color: UI.hex.green,
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
+    uiText(this, cx, top + 122, t(objectiveKey), {
+      family: 'ui',
+      size: 15,
+      color: UI.hex.green,
+      bold: true,
+      originX: 0.5,
+      glow: 'green',
+    });
 
-    this.add
-      .text(cx, top + 122, t('briefing.s_hint', { sec: mission.sRankRules.maxTimeSec }), {
-        fontFamily: UI.font,
-        fontSize: '10px',
-        color: UI.hex.muted,
-      })
-      .setOrigin(0.5)
-      .setDepth(8);
+    uiText(this, cx, top + 148, t('briefing.s_hint', { sec: mission.sRankRules.maxTimeSec }), {
+      family: 'mono',
+      size: 12,
+      color: UI.hex.muted,
+      originX: 0.5,
+    });
 
-    pagerButton(this, cx, top + 165, t('briefing.start'), {
+    pagerButton(this, cx, top + 195, t('briefing.start'), {
       fill: UI.hex.cyan,
       color: UI.hex.bg,
-      fontSize: '15px',
+      fontSize: '16px',
       onClick: () => {
         this.registry.set('runDeaths', 0);
         this.scene.start('MissionScene', { missionId: this.missionId });
       },
     });
 
-    pagerButton(this, cx, top + 205, t('common.back'), {
-      fill: '#121820',
-      color: UI.hex.muted,
-      fontSize: '12px',
+    pagerButton(this, cx, top + 240, t('common.back'), {
+      fill: UI.hex.muted,
+      color: UI.hex.bg,
+      fontSize: '13px',
+      outlined: true,
       onClick: () => this.scene.start('MissionSelectScene'),
     });
   }

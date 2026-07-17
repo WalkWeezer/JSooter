@@ -154,7 +154,7 @@ export class InputRouter {
 
     const btnBg = this.scene.add.circle(0, 0, 34, 0xff2a6d, 0.85);
     const btnLabel = this.scene.add
-      .text(0, 0, 'ATK', { fontFamily: 'monospace', fontSize: '14px', color: '#0B0D12' })
+      .text(0, 0, 'ATK', { fontFamily: '"Exo 2", sans-serif', fontSize: '14px', color: '#0B0D12', fontStyle: 'bold' })
       .setOrigin(0.5);
     this.attackBtn = this.scene.add
       .container(cam.width - 70, y - 90, [btnBg, btnLabel])

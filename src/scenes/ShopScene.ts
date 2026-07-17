@@ -3,7 +3,7 @@ import { t } from '../i18n';
 import { saveService } from '../save/SaveService';
 import { MASKS } from '../data/masks';
 import { purchaseService } from '../iap/PurchaseService';
-import { mountPagerChrome, pagerButton, UI } from '../ui/PagerChrome';
+import { mountPagerChrome, pagerButton, uiText, UI } from '../ui/PagerChrome';
 
 export class ShopScene extends Phaser.Scene {
   constructor() {
@@ -28,47 +28,47 @@ export class ShopScene extends Phaser.Scene {
     const w = layout.content.w;
 
     MASKS.forEach((mask, i) => {
-      const y = top + 14 + i * 52;
+      const y = top + 10 + i * 56;
       const owned = save.unlockedMasks.includes(mask.id) || mask.costImpulses === 0;
       const equipped = save.maskId === mask.id;
 
       const g = this.add.graphics().setDepth(6);
-      g.lineStyle(1, equipped ? UI.green : UI.cyan, 0.45);
-      g.strokeRect(left + 2, y, w - 4, 46);
+      g.fillStyle(equipped ? 0x0c1a12 : 0x0a1010, 0.6);
+      g.fillRect(left + 2, y, w - 4, 50);
+      g.lineStyle(1, equipped ? UI.green : UI.cyan, equipped ? 0.7 : 0.4);
+      g.strokeRect(left + 2, y, w - 4, 50);
 
-      this.add
-        .text(left + 10, y + 12, `${t(mask.nameKey)}${equipped ? ' ★' : ''}`, {
-          fontFamily: UI.font,
-          fontSize: '12px',
-          color: UI.hex.text,
-        })
-        .setOrigin(0, 0.5)
-        .setDepth(7);
-      this.add
-        .text(left + 10, y + 30, t(mask.descKey), {
-          fontFamily: UI.font,
-          fontSize: '9px',
-          color: UI.hex.muted,
-          wordWrap: { width: w - 110 },
-        })
-        .setOrigin(0, 0.5)
-        .setDepth(7);
+      uiText(this, left + 12, y + 14, `${t(mask.nameKey)}${equipped ? ' ★' : ''}`, {
+        family: 'ui',
+        size: 15,
+        color: equipped ? UI.hex.green : UI.hex.text,
+        bold: true,
+        originY: 0.5,
+        glow: equipped ? 'green' : 'none',
+      });
+      uiText(this, left + 12, y + 34, t(mask.descKey), {
+        family: 'ui',
+        size: 12,
+        color: UI.hex.muted,
+        originY: 0.5,
+        wrap: w - 120,
+      });
 
       if (owned) {
-        pagerButton(this, left + w - 48, y + 23, equipped ? t('shop.owned') : t('shop.equip'), {
+        pagerButton(this, left + w - 52, y + 25, equipped ? t('shop.owned') : t('shop.equip'), {
           fill: equipped ? UI.hex.green : UI.hex.cyan,
           color: UI.hex.bg,
-          fontSize: '11px',
+          fontSize: '12px',
           onClick: () => {
             saveService.equipMask(mask.id);
             this.draw();
           },
         });
       } else {
-        pagerButton(this, left + w - 52, y + 23, `${t('shop.buy')} ${mask.costImpulses}`, {
+        pagerButton(this, left + w - 56, y + 25, `${t('shop.buy')} ${mask.costImpulses}`, {
           fill: save.impulses >= mask.costImpulses ? UI.hex.magenta : '#333',
           color: UI.hex.bg,
-          fontSize: '10px',
+          fontSize: '11px',
           onClick: () => {
             if (saveService.buyMask(mask.id, mask.costImpulses)) this.draw();
           },
@@ -76,11 +76,12 @@ export class ShopScene extends Phaser.Scene {
       }
     });
 
-    const by = top + 14 + MASKS.length * 52 + 16;
+    const by = top + 10 + MASKS.length * 56 + 14;
     pagerButton(this, layout.content.x, by, t('shop.remove_ads'), {
-      fill: save.removeAds ? '#152018' : '#121820',
-      color: save.removeAds ? UI.hex.green : UI.hex.text,
-      fontSize: '11px',
+      fill: save.removeAds ? UI.hex.green : UI.hex.muted,
+      color: UI.hex.bg,
+      fontSize: '12px',
+      outlined: !save.removeAds,
       onClick: () => {
         void (async () => {
           if (save.removeAds) return;
@@ -89,10 +90,11 @@ export class ShopScene extends Phaser.Scene {
         })();
       },
     });
-    pagerButton(this, layout.content.x, by + 36, t('shop.pack_cassettes'), {
-      fill: '#121820',
-      color: UI.hex.amber,
-      fontSize: '11px',
+    pagerButton(this, layout.content.x, by + 40, t('shop.pack_cassettes'), {
+      fill: UI.hex.amber,
+      color: UI.hex.bg,
+      fontSize: '12px',
+      outlined: true,
       onClick: () => {
         void (async () => {
           await purchaseService.purchase('cassettes_small');

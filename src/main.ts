@@ -17,6 +17,19 @@ async function bootstrap(): Promise<void> {
   await initPlatform();
   saveService.unlock('tut_01');
 
+  // Wait for Orbitron / Exo 2 / JetBrains Mono so pager UI matches GDD type.
+  try {
+    await Promise.race([
+      document.fonts.load('700 28px Orbitron'),
+      document.fonts.load('700 22px "Exo 2"'),
+      document.fonts.load('500 14px "JetBrains Mono"'),
+      document.fonts.ready,
+      new Promise((r) => setTimeout(r, 1200)),
+    ]);
+  } catch {
+    /* keep system fallbacks */
+  }
+
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game-root',

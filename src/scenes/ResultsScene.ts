@@ -4,7 +4,7 @@ import type { MissionResultPayload } from './MissionScene';
 import { saveService } from '../save/SaveService';
 import { getNextMissionId } from '../data/missionIndex';
 import { adsService } from '../ads/AdsService';
-import { mountPagerChrome, pagerButton, missionCode, UI } from '../ui/PagerChrome';
+import { mountPagerChrome, pagerButton, missionCode, uiText, UI } from '../ui/PagerChrome';
 
 export class ResultsScene extends Phaser.Scene {
   private payload!: MissionResultPayload;
@@ -31,42 +31,41 @@ export class ResultsScene extends Phaser.Scene {
 
     const cx = layout.content.x;
     const top = layout.content.y - layout.content.h / 2;
+    const isS = p.rank.startsWith('S');
 
-    this.add
-      .text(cx, top + 20, t('results.rank', { rank: p.rank }), {
-        fontFamily: UI.font,
-        fontSize: '36px',
-        color: p.rank.startsWith('S') ? UI.hex.green : UI.hex.magenta,
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(this, cx, top + 12, t('results.rank', { rank: p.rank }), {
+      family: 'display',
+      size: 40,
+      color: isS ? UI.hex.green : UI.hex.magenta,
+      bold: true,
+      originX: 0.5,
+      glow: isS ? 'green' : 'magenta',
+    });
 
-    this.add
-      .text(
-        cx,
-        top + 70,
-        `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}\n${p.alarm ? t('mission.alarm') : t('pager.signal_ok')}\n${t('shop.impulses', { count: saveService.get().impulses })}`,
-        {
-          fontFamily: UI.font,
-          fontSize: '12px',
-          color: UI.hex.text,
-          align: 'center',
-        },
-      )
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(
+      this,
+      cx,
+      top + 68,
+      `${t('results.deaths', { count: p.deaths })}\n${t('results.time', { time: p.timeSec.toFixed(1) + 's' })}\n${p.alarm ? t('mission.alarm') : t('pager.signal_ok')}\n${t('shop.impulses', { count: saveService.get().impulses })}`,
+      {
+        family: 'mono',
+        size: 14,
+        color: UI.hex.text,
+        originX: 0.5,
+        align: 'center',
+      },
+    );
 
     const goNext = async (target: () => void) => {
       await adsService.showInterstitial();
       target();
     };
 
-    let y = top + 145;
+    let y = top + 160;
     pagerButton(this, cx, y, t('ads.reward_x2'), {
       fill: UI.hex.amber,
       color: UI.hex.bg,
-      fontSize: '12px',
+      fontSize: '13px',
       onClick: () => {
         void (async () => {
           const ok = await adsService.showRewarded();
@@ -74,23 +73,24 @@ export class ResultsScene extends Phaser.Scene {
         })();
       },
     });
-    y += 40;
+    y += 44;
 
     if (nextId) {
       pagerButton(this, cx, y, t('results.next'), {
         fill: UI.hex.cyan,
         color: UI.hex.bg,
+        fontSize: '15px',
         onClick: () => {
           void goNext(() => this.scene.start('BriefingScene', { missionId: nextId }));
         },
       });
-      y += 40;
+      y += 44;
     }
 
     pagerButton(this, cx, y, t('mission.retry'), {
       fill: UI.hex.magenta,
       color: UI.hex.bg,
-      fontSize: '13px',
+      fontSize: '14px',
       onClick: () => {
         void goNext(() => {
           this.registry.set('runDeaths', 0);
@@ -98,12 +98,13 @@ export class ResultsScene extends Phaser.Scene {
         });
       },
     });
-    y += 38;
+    y += 42;
 
     pagerButton(this, cx, y, t('results.to_hub'), {
-      fill: '#121820',
-      color: UI.hex.cyan,
-      fontSize: '12px',
+      fill: UI.hex.muted,
+      color: UI.hex.bg,
+      fontSize: '13px',
+      outlined: true,
       onClick: () => {
         void goNext(() => this.scene.start('HubScene'));
       },

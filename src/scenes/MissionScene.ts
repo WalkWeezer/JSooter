@@ -140,7 +140,7 @@ export class MissionScene extends Phaser.Scene {
       this.vfx.pickupPulse(img);
       const label = this.add
         .text(img.x, img.y + 16, w.type.toUpperCase(), {
-          fontFamily: 'monospace',
+          fontFamily: '"JetBrains Mono", "Exo 2", monospace',
           fontSize: '9px',
           color: '#ffc857',
         })
@@ -172,7 +172,7 @@ export class MissionScene extends Phaser.Scene {
 
     this.hudText = this.add
       .text(12, 12, '', {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '14px',
         color: '#cfd6e6',
         backgroundColor: '#0b0d12aa',
@@ -189,7 +189,7 @@ export class MissionScene extends Phaser.Scene {
 
     this.rangeHint = this.add
       .text(12, 100, '', {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '12px',
         color: '#39ff14',
         backgroundColor: '#0b0d12aa',
@@ -202,7 +202,7 @@ export class MissionScene extends Phaser.Scene {
 
     const pauseBtn = this.add
       .text(this.scale.width - 12, 12, t('mission.pause'), {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '14px',
         color: '#2DE2E6',
         backgroundColor: '#121820',
@@ -221,7 +221,7 @@ export class MissionScene extends Phaser.Scene {
 
     const restartBtn = this.add
       .text(this.scale.width - 12, 44, t('mission.restart'), {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '14px',
         color: '#FFC857',
         backgroundColor: '#1a1520',
@@ -449,7 +449,7 @@ export class MissionScene extends Phaser.Scene {
   private flashPickup(type: WeaponType): void {
     const toast = this.add
       .text(this.player.body.x, this.player.body.y - 24, type.toUpperCase(), {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '12px',
         color: '#ffc857',
       })
@@ -493,7 +493,7 @@ export class MissionScene extends Phaser.Scene {
     this.cameras.main.flash(80, 255, 42, 109, false);
     const banner = this.add
       .text(this.scale.width / 2, 72, t('mission.alarm'), {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '22px',
         color: '#FF2A6D',
         backgroundColor: '#0b0d12cc',
@@ -549,7 +549,7 @@ export class MissionScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const label = this.add
       .text(width / 2, height / 2, t('mission.died'), {
-        fontFamily: 'monospace',
+        fontFamily: '"JetBrains Mono", "Exo 2", monospace',
         fontSize: '28px',
         color: '#FF2A6D',
         backgroundColor: '#0b0d12cc',

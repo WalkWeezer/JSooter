@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { t, getLang, onLangChange, setLang } from '../i18n';
 import { audioService } from '../audio/AudioService';
-import { mountPagerChrome, pagerButton, UI } from '../ui/PagerChrome';
+import { mountPagerChrome, pagerButton, uiText, UI } from '../ui/PagerChrome';
 
 export class SettingsScene extends Phaser.Scene {
   private unsub: (() => void) | null = null;
@@ -32,28 +32,28 @@ export class SettingsScene extends Phaser.Scene {
     const cx = layout.content.x;
     const top = layout.content.y - layout.content.h / 2;
 
-    this.add
-      .text(cx, top + 8, t('settings.language'), {
-        fontFamily: UI.font,
-        fontSize: '11px',
-        color: UI.hex.muted,
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(this, cx, top + 10, t('settings.language'), {
+      family: 'mono',
+      size: 13,
+      color: UI.hex.muted,
+      originX: 0.5,
+    });
 
-    pagerButton(this, cx - 70, top + 42, t('settings.lang_ru'), {
-      fill: lang === 'ru' ? UI.hex.cyan : '#152028',
-      color: lang === 'ru' ? UI.hex.bg : UI.hex.cyan,
-      fontSize: '13px',
+    pagerButton(this, cx - 78, top + 48, t('settings.lang_ru'), {
+      fill: lang === 'ru' ? UI.hex.cyan : UI.hex.muted,
+      color: UI.hex.bg,
+      fontSize: '14px',
+      outlined: lang !== 'ru',
       onClick: () => {
         setLang('ru');
         this.registry.set('lang', 'ru');
       },
     });
-    pagerButton(this, cx + 70, top + 42, t('settings.lang_en'), {
-      fill: lang === 'en' ? UI.hex.cyan : '#152028',
-      color: lang === 'en' ? UI.hex.bg : UI.hex.cyan,
-      fontSize: '13px',
+    pagerButton(this, cx + 78, top + 48, t('settings.lang_en'), {
+      fill: lang === 'en' ? UI.hex.cyan : UI.hex.muted,
+      color: UI.hex.bg,
+      fontSize: '14px',
+      outlined: lang !== 'en',
       onClick: () => {
         setLang('en');
         this.registry.set('lang', 'en');
@@ -63,12 +63,13 @@ export class SettingsScene extends Phaser.Scene {
     pagerButton(
       this,
       cx,
-      top + 90,
+      top + 105,
       `${t('settings.mute')}: ${this.userMuted ? t('common.on') : t('common.off')}`,
       {
-        fill: '#121820',
-        color: UI.hex.text,
-        fontSize: '13px',
+        fill: UI.hex.green,
+        color: UI.hex.bg,
+        fontSize: '14px',
+        outlined: true,
         onClick: () => {
           this.userMuted = !this.userMuted;
           audioService.setUserMuted(this.userMuted);
@@ -77,20 +78,19 @@ export class SettingsScene extends Phaser.Scene {
       },
     );
 
-    this.add
-      .text(cx, top + 130, t('settings.cloud_save_reason'), {
-        fontFamily: UI.font,
-        fontSize: '10px',
-        color: UI.hex.muted,
-        align: 'center',
-        wordWrap: { width: layout.content.w - 20 },
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(8);
+    uiText(this, cx, top + 150, t('settings.cloud_save_reason'), {
+      family: 'ui',
+      size: 13,
+      color: UI.hex.muted,
+      originX: 0.5,
+      align: 'center',
+      wrap: layout.content.w - 24,
+    });
 
-    pagerButton(this, cx, top + 175, t('settings.cloud_save'), {
+    pagerButton(this, cx, top + 210, t('settings.cloud_save'), {
       fill: UI.hex.cyan,
       color: UI.hex.bg,
+      fontSize: '15px',
       onClick: () => console.info('[auth] cloud save requested — open Yandex auth on explicit tap'),
     });
   }
