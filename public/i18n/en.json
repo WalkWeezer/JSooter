@@ -51,6 +51,7 @@
     "pause": "Pause",
     "resume": "Resume",
     "retry": "Retry",
+    "restart": "Restart",
     "died": "Killed",
     "exit_hint": "Exit",
     "alarm": "Alarm",

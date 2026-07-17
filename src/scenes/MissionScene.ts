@@ -198,6 +198,8 @@ export class MissionScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(2000);
 
+    this.registry.set('currentMissionId', m.id);
+
     const pauseBtn = this.add
       .text(this.scale.width - 12, 12, t('mission.pause'), {
         fontFamily: 'monospace',
@@ -215,6 +217,25 @@ export class MissionScene extends Phaser.Scene {
       this.scene.pause();
       gameplayStop();
       this.scene.launch('PauseOverlay');
+    });
+
+    const restartBtn = this.add
+      .text(this.scale.width - 12, 44, t('mission.restart'), {
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        color: '#FFC857',
+        backgroundColor: '#1a1520',
+        padding: { x: 8, y: 6 },
+      })
+      .setOrigin(1, 0)
+      .setScrollFactor(0)
+      .setDepth(2000)
+      .setInteractive({ useHandCursor: true });
+
+    restartBtn.on('pointerdown', () => {
+      this.registry.set('runDeaths', 0);
+      gameplayStop();
+      this.scene.restart({ missionId: this.mission.id });
     });
 
     gameplayStart();
