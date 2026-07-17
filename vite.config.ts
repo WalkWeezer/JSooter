@@ -12,8 +12,9 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,
+    host: true, // 0.0.0.0 — нужен для Network URL
     port: 5173,
+    strictPort: false,
   },
   build: {
     outDir: 'dist',

@@ -52,7 +52,9 @@
     "retry": "Retry",
     "died": "Spotted",
     "exit_hint": "Exit",
-    "alarm": "Alarm"
+    "alarm": "Alarm",
+    "range": "Range",
+    "in_range": "IN RANGE — attack!"
   },
   "results": {
     "title": "Results",
