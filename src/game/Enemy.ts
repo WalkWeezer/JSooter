@@ -6,6 +6,7 @@ import { ENEMY_ANIM_SHEETS, playAnim } from './CharacterAnims';
 export class EnemyActor {
   readonly body: Phaser.Physics.Arcade.Sprite;
   readonly cone: Phaser.GameObjects.Graphics;
+  readonly underglow: Phaser.GameObjects.Arc;
   readonly type: EnemyDef['type'];
   route: Phaser.Math.Vector2[] = [];
   routeIndex = 0;
@@ -27,11 +28,12 @@ export class EnemyActor {
     this.type = def.type;
     const sheet = ENEMY_ANIM_SHEETS[def.type] || ENEMY_ANIM_SHEETS.patrol;
     this.animPrefix = `enemy_${def.type in ENEMY_ANIM_SHEETS ? def.type : 'patrol'}`;
+    this.underglow = scene.add.circle(x, y, 24, 0xff2a6d, 0.16).setDepth(17);
     this.body = scene.physics.add.sprite(x, y, sheet, 0);
-    this.body.setCircle(14, 2, 2);
+    this.body.setCircle(16, 4, 4);
     this.body.setImmovable(true);
     this.body.setDepth(18);
-    this.body.setDisplaySize(50, 50);
+    this.body.setDisplaySize(64, 64);
     playAnim(this.body, `${this.animPrefix}_idle`, false);
     this.cone = scene.add.graphics().setDepth(5);
     this.facing = Phaser.Math.DegToRad(def.facing ?? 0);
@@ -89,6 +91,7 @@ export class EnemyActor {
 
     this.facing = Phaser.Math.Angle.RotateTo(this.facing, this.targetFacing, this.turnSpeed * dt);
     this.body.setRotation(this.facing);
+    this.underglow.setPosition(this.body.x, this.body.y);
 
     let moving = false;
     if (moveAngle !== null) {
@@ -130,7 +133,7 @@ export class EnemyActor {
     if (!this.alive) return;
     const alertHot = this.alert >= 0.55;
     const fill = 0xff2a6d;
-    this.cone.fillStyle(fill, alertHot ? 0.3 : 0.18);
+    this.cone.fillStyle(fill, alertHot ? 0.22 : 0.12);
     this.cone.beginPath();
     this.cone.moveTo(this.body.x, this.body.y);
     const steps = 28;
@@ -165,6 +168,7 @@ export class EnemyActor {
     this.alive = false;
     this.body.setVelocity(0);
     this.cone.clear();
+    this.underglow.setVisible(false);
     playAnim(this.body, `${this.animPrefix}_death`, false);
     this.body.once('animationcomplete', () => {
       if (this.body.active) this.body.setAlpha(0.45);
@@ -174,5 +178,6 @@ export class EnemyActor {
   destroy(): void {
     this.body.destroy();
     this.cone.destroy();
+    this.underglow.destroy();
   }
 }

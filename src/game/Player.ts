@@ -43,6 +43,7 @@ export const IS_MELEE: Record<WeaponType, boolean> = {
 export class PlayerActor {
   readonly body: Phaser.Physics.Arcade.Sprite;
   readonly weaponSprite: Phaser.GameObjects.Image;
+  readonly underglow: Phaser.GameObjects.Arc;
   facing = 0;
   weapon: WeaponType = 'fist';
   speed = 160;
@@ -52,11 +53,12 @@ export class PlayerActor {
   private attacking = false;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
+    this.underglow = scene.add.circle(x, y, 28, 0x2de2e6, 0.22).setDepth(19);
     this.body = scene.physics.add.sprite(x, y, PLAYER_ANIM_SHEET, 0);
-    this.body.setCircle(12, 4, 4);
+    this.body.setCircle(14, 6, 6);
     this.body.setCollideWorldBounds(true);
     this.body.setDepth(20);
-    this.body.setDisplaySize(52, 52);
+    this.body.setDisplaySize(68, 68);
     playAnim(this.body, 'player_idle', false);
 
     this.weaponSprite = scene.add.image(x, y, 'wpn_fist').setDepth(21).setDisplaySize(20, 20);
@@ -97,6 +99,8 @@ export class PlayerActor {
       this.facing = Math.atan2(moveY, moveX);
     }
     this.body.setRotation(this.facing);
+    this.underglow.setPosition(this.body.x, this.body.y);
+    this.underglow.setVisible(this.alive);
 
     if (!this.attacking) {
       const moving = Math.hypot(moveX, moveY) > 0.08;
@@ -115,11 +119,13 @@ export class PlayerActor {
     this.attacking = false;
     this.body.setVelocity(0);
     this.weaponSprite.setVisible(false);
+    this.underglow.setVisible(false);
     playAnim(this.body, 'player_death', false);
   }
 
   destroy(): void {
     this.body.destroy();
     this.weaponSprite.destroy();
+    this.underglow.destroy();
   }
 }
