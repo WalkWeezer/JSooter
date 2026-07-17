@@ -88,13 +88,19 @@ export class MissionScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, mapW, mapH);
     this.cameras.main.setBackgroundColor('#07080c');
     this.cameras.main.setRoundPixels(true);
-    // Large maps should scroll — don't fit whole floor on screen
-    const fitZoom = Math.min(
-      (this.scale.width * 0.92) / Math.min(mapW, 640),
-      (this.scale.height * 0.92) / Math.min(mapH, 480),
-      1.15,
+    // Reserve space for twin-stick UI on mobile; large maps scroll, small ones fill view
+    const touch = Boolean(
+      this.registry.get('forceTouchUi') ||
+        new URLSearchParams(window.location.search).get('mobile') === '1' ||
+        this.scale.width < 720,
     );
-    this.cameras.main.setZoom(Phaser.Math.Clamp(fitZoom, 0.85, 1.15));
+    const uiReserve = touch ? Math.max(210, this.scale.height * 0.28) : 24;
+    const viewW = this.scale.width;
+    const viewH = Math.max(220, this.scale.height - uiReserve);
+    const fit = Math.min(viewW / mapW, viewH / mapH);
+    const large = mapW > viewW * 0.95 || mapH > viewH * 0.95;
+    const zoom = large ? Phaser.Math.Clamp(Math.min(1.1, fit * 1.05), 0.75, 1.15) : Phaser.Math.Clamp(fit * 0.92, 0.9, 1.45);
+    this.cameras.main.setZoom(zoom);
 
     const wallSet = new Set(m.walls.map(([x, y]) => `${x},${y}`));
     paintClubLevel(this, m, wallSet);
