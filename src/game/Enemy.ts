@@ -12,6 +12,7 @@ export class EnemyActor {
   readonly cone: Phaser.GameObjects.Graphics;
   readonly underglow: Phaser.GameObjects.Arc;
   readonly type: EnemyDef['type'];
+  readonly vip: boolean;
   route: Phaser.Math.Vector2[] = [];
   routeIndex = 0;
   facing: number;
@@ -33,9 +34,12 @@ export class EnemyActor {
     const x = def.x * tileSize + tileSize / 2;
     const y = def.y * tileSize + tileSize / 2;
     this.type = def.type;
+    this.vip = Boolean(def.vip);
     const sheet = ENEMY_ANIM_SHEETS[def.type] || ENEMY_ANIM_SHEETS.patrol;
     this.animPrefix = `enemy_${def.type in ENEMY_ANIM_SHEETS ? def.type : 'patrol'}`;
-    this.underglow = scene.add.circle(x, y, 24, 0xff2a6d, 0.16).setDepth(17);
+    this.underglow = scene.add
+      .circle(x, y, 24, this.vip ? 0xffc857 : 0xff2a6d, this.vip ? 0.28 : 0.16)
+      .setDepth(17);
     this.body = scene.physics.add.sprite(x, y, sheet, 0);
     // Body must be smaller than a tile so wall colliders catch edges
     this.body.setDisplaySize(56, 56);

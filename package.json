@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "check:i18n": "node scripts/check-i18n.mjs",
     "check:budget": "node scripts/check-budget.mjs",
+    "build:missions": "node scripts/build-missions.mjs",
     "pack:yandex": "node scripts/pack-yandex.mjs"
   },
   "dependencies": {

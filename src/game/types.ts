@@ -6,6 +6,8 @@ export type EnemyDef = {
   y: number;
   route?: number[][];
   facing?: number;
+  /** VIP target — only these must die for objective `vip`. */
+  vip?: boolean;
 };
 
 export type WeaponDef = {

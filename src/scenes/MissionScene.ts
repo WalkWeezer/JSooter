@@ -332,11 +332,20 @@ export class MissionScene extends Phaser.Scene {
             : this.mission.objective === 'timed'
               ? 'briefing.objective_timed'
               : 'briefing.objective_clear';
+    const allDown = this.enemies.every((e) => !e.alive);
+    const vipAlive = this.enemies.some((e) => e.vip && e.alive);
+    const needExit =
+      this.mission.objective === 'extract'
+        ? this.hasCase
+        : this.mission.objective === 'vip'
+          ? !vipAlive && this.enemies.some((e) => e.vip)
+          : allDown;
     this.hudText?.setText(
       `${t(objectiveKey)}\n` +
         `${this.player.weapon.toUpperCase()} | ${t('results.deaths', { count: this.deaths })}\n` +
         `${elapsed.toFixed(1)}s` +
         (this.hasCase ? ' | CASE' : '') +
+        (needExit ? ` | ${t('mission.exit_hint')}` : '') +
         (this.alarm ? ` | ${t('mission.alarm')}` : ''),
     );
     this.weaponHud?.setTexture(WEAPON_TEXTURE[this.player.weapon]);
@@ -372,17 +381,23 @@ export class MissionScene extends Phaser.Scene {
 
   private checkWin(): boolean {
     const allDown = this.enemies.every((e) => !e.alive);
+    const vipDown = this.enemies.filter((e) => e.vip).every((e) => !e.alive);
+    const hasVip = this.enemies.some((e) => e.vip);
     const atExit =
       Phaser.Math.Distance.Between(this.player.body.x, this.player.body.y, this.exitZone.x, this.exitZone.y) < 22;
 
     switch (this.mission.objective) {
       case 'extract':
+        // Grab case, escape — patrols optional (GDD extract).
         return this.hasCase && atExit;
-      case 'clear':
       case 'vip':
+        // Neutralize VIP(s), then evacuate. Other guards can be ignored.
+        return (hasVip ? vipDown : allDown) && atExit;
+      case 'clear':
       case 'timed':
       case 'silent':
-        return allDown;
+        // Hotline loop: finish the job, then hit the exit.
+        return allDown && atExit;
       default:
         return allDown && atExit;
     }
