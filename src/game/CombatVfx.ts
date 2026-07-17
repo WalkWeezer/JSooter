@@ -16,13 +16,14 @@ export class CombatVfx {
     this.swingGfx.destroy();
   }
 
-  /** Aim cone: cyan idle, green when a valid target is in range. */
+  /** Aim cone clipped by walls when wall list provided. */
   drawAimCone(
     x: number,
     y: number,
     facing: number,
     weapon: WeaponType,
     hasTarget: boolean,
+    walls?: Phaser.Geom.Rectangle[],
   ): void {
     const range = WEAPON_RANGE[weapon];
     const fov = WEAPON_FOV[weapon];
@@ -32,22 +33,28 @@ export class CombatVfx {
     this.rangeGfx.fillStyle(color, alpha);
     this.rangeGfx.beginPath();
     this.rangeGfx.moveTo(x, y);
-    const steps = 12;
+    const steps = 14;
     for (let i = 0; i <= steps; i++) {
       const a = facing - fov + ((fov * 2) * i) / steps;
-      this.rangeGfx.lineTo(x + Math.cos(a) * range, y + Math.sin(a) * range);
+      let dist = range;
+      if (walls?.length) {
+        // lazy import-free local ray
+        for (let s = 1; s <= 24; s++) {
+          const d = (range * s) / 24;
+          const px = x + Math.cos(a) * d;
+          const py = y + Math.sin(a) * d;
+          if (walls.some((r) => r.contains(px, py))) {
+            dist = Math.max(0, d - range / 24);
+            break;
+          }
+        }
+      }
+      this.rangeGfx.lineTo(x + Math.cos(a) * dist, y + Math.sin(a) * dist);
     }
     this.rangeGfx.closePath();
     this.rangeGfx.fillPath();
     this.rangeGfx.lineStyle(2, color, hasTarget ? 0.85 : 0.4);
-    this.rangeGfx.strokeCircle(x, y, range);
-    // outer tick
-    this.rangeGfx.lineBetween(
-      x + Math.cos(facing) * (range - 6),
-      y + Math.sin(facing) * (range - 6),
-      x + Math.cos(facing) * range,
-      y + Math.sin(facing) * range,
-    );
+    this.rangeGfx.strokeCircle(x, y, Math.min(range, 20));
   }
 
   playMeleeSwing(x: number, y: number, facing: number, weapon: WeaponType): void {
@@ -133,8 +140,13 @@ export class CombatVfx {
             return;
           }
           const dist = Phaser.Math.Distance.Between(startX, startY, bullet.x, bullet.y);
-          if (dist > maxDist || blocked(startX, startY, bullet.x, bullet.y)) {
+          // point-sample current bullet cell against walls (prev→curr segment)
+          const hitWall =
+            blocked(bullet.x - Math.cos(ang) * 8, bullet.y - Math.sin(ang) * 8, bullet.x, bullet.y) ||
+            blocked(startX, startY, bullet.x, bullet.y);
+          if (dist > maxDist || hitWall) {
             alive = false;
+            this.hitSpark(bullet.x, bullet.y);
             bullet.destroy();
             trail.destroy();
             timer.remove(false);

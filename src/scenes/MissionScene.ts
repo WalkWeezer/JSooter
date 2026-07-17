@@ -16,7 +16,7 @@ import { getMission } from '../data/missionIndex';
 import { saveService } from '../save/SaveService';
 import { getMask } from '../data/masks';
 import { adsService } from '../ads/AdsService';
-import { createGameTextures, WEAPON_TEXTURE } from '../game/SpriteFactory';
+import { WEAPON_TEXTURE, ensureFallbackTextures } from '../game/SpriteFactory';
 import { CombatVfx } from '../game/CombatVfx';
 
 type Pickup = {
@@ -73,7 +73,7 @@ export class MissionScene extends Phaser.Scene {
     this.pickups = [];
     this.wallRects = [];
 
-    createGameTextures(this);
+    ensureFallbackTextures(this);
     this.vfx = new CombatVfx(this);
 
     const m = this.mission;
@@ -108,6 +108,7 @@ export class MissionScene extends Phaser.Scene {
 
     for (const e of m.enemies) {
       const enemy = new EnemyActor(this, e, ts);
+      enemy.setWalls(this.wallRects);
       if (mask.perk === 'vision') {
         enemy.cone.setAlpha(1);
       }
@@ -271,6 +272,7 @@ export class MissionScene extends Phaser.Scene {
       this.player.facing,
       this.player.weapon,
       Boolean(target),
+      this.wallRects,
     );
     if (this.rangeHint) {
       this.rangeHint.setText(

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
 import { audioService } from '../audio/AudioService';
+import { preloadGameSprites, ensureFallbackTextures } from '../game/SpriteFactory';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -28,10 +29,7 @@ export class PreloadScene extends Phaser.Scene {
       fill.width = Math.max(4, (barWidth - 4) * value);
     });
 
-    this.load.image(
-      'pixel',
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W5aUAAAAASUVORK5CYII=',
-    );
+    preloadGameSprites(this);
     this.load.audio('bgm-hub', 'audio/hub-loop.mp3');
     this.load.audio('bgm-combat', 'audio/combat-loop.mp3');
 
@@ -43,6 +41,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create(): void {
+    ensureFallbackTextures(this);
     this.scene.start('HubScene');
   }
 }

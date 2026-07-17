@@ -1,210 +1,56 @@
 import Phaser from 'phaser';
 
-/**
- * Procedural neon top-down sprites. Consistent palette, readable at 32px.
- */
-export function createGameTextures(scene: Phaser.Scene): void {
-  if (scene.textures.exists('player')) return;
+/** Texture keys used across the game. Loaded as PNG from public/assets/sprites. */
+export const SPRITE_FILES: Record<string, string> = {
+  player: 'assets/sprites/player.png',
+  enemy_patrol: 'assets/sprites/enemy_patrol.png',
+  enemy_shotgun: 'assets/sprites/enemy_shotgun.png',
+  enemy_shield: 'assets/sprites/enemy_shield.png',
+  enemy_sniper: 'assets/sprites/enemy_sniper.png',
+  enemy_down: 'assets/sprites/enemy_down.png',
+  wpn_fist: 'assets/sprites/wpn_fist.png',
+  wpn_bat: 'assets/sprites/wpn_bat.png',
+  wpn_knife: 'assets/sprites/wpn_knife.png',
+  wpn_pistol: 'assets/sprites/wpn_pistol.png',
+  wpn_shotgun: 'assets/sprites/wpn_shotgun.png',
+  wpn_uzi: 'assets/sprites/wpn_uzi.png',
+  case: 'assets/sprites/case.png',
+  floor_a: 'assets/sprites/floor_a.png',
+  floor_b: 'assets/sprites/floor_b.png',
+  wall: 'assets/sprites/wall.png',
+  exit: 'assets/sprites/exit.png',
+  bullet: 'assets/sprites/bullet.png',
+  muzzle: 'assets/sprites/muzzle.png',
+  spark: 'assets/sprites/spark.png',
+  pixel: 'assets/sprites/pixel.png',
+};
 
-  const g = scene.make.graphics({ x: 0, y: 0 }, false);
-
-  // --- floor / wall / props ---
-  drawFloor(g, 0x171b26, 0x1c2230);
-  g.generateTexture('floor_a', 32, 32);
-  g.clear();
-  drawFloor(g, 0x141821, 0x191e2a);
-  g.generateTexture('floor_b', 32, 32);
-  g.clear();
-
-  // wall block
-  g.fillStyle(0x2a3142, 1);
-  g.fillRoundedRect(1, 1, 30, 30, 3);
-  g.lineStyle(2, 0x2de2e6, 0.45);
-  g.strokeRoundedRect(2, 2, 28, 28, 2);
-  g.fillStyle(0x0b0d12, 0.35);
-  g.fillRect(8, 8, 16, 16);
-  g.generateTexture('wall', 32, 32);
-  g.clear();
-
-  // exit pad
-  g.lineStyle(3, 0x39ff14, 0.9);
-  g.strokeRoundedRect(4, 4, 24, 24, 4);
-  g.fillStyle(0x39ff14, 0.2);
-  g.fillRoundedRect(6, 6, 20, 20, 3);
-  g.generateTexture('exit', 32, 32);
-  g.clear();
-
-  // case
-  g.fillStyle(0x7a5cff, 1);
-  g.fillRoundedRect(6, 8, 20, 16, 3);
-  g.lineStyle(2, 0xcbb8ff, 1);
-  g.strokeRoundedRect(6, 8, 20, 16, 3);
-  g.fillStyle(0xffc857, 1);
-  g.fillCircle(16, 16, 3);
-  g.generateTexture('case', 32, 32);
-  g.clear();
-
-  // --- player ---
-  drawCourier(g, 0x2de2e6, 0x0b0d12, true);
-  g.generateTexture('player', 32, 32);
-  g.clear();
-
-  // --- enemies ---
-  drawCourier(g, 0xff2a6d, 0x1a0a10, false);
-  g.generateTexture('enemy_patrol', 32, 32);
-  g.clear();
-
-  drawCourier(g, 0xff8844, 0x1a1008, false);
-  // shotgun mark
-  g.fillStyle(0xffc857, 1);
-  g.fillRect(22, 14, 8, 4);
-  g.generateTexture('enemy_shotgun', 32, 32);
-  g.clear();
-
-  drawCourier(g, 0x88aaff, 0x0a1020, false);
-  // shield plate in front
-  g.fillStyle(0xc0d4ff, 0.95);
-  g.fillRoundedRect(20, 8, 6, 16, 2);
-  g.lineStyle(1, 0xffffff, 0.8);
-  g.strokeRoundedRect(20, 8, 6, 16, 2);
-  g.generateTexture('enemy_shield', 32, 32);
-  g.clear();
-
-  drawCourier(g, 0xc44dff, 0x140818, false);
-  g.fillStyle(0xffffff, 0.8);
-  g.fillRect(24, 14, 6, 2);
-  g.generateTexture('enemy_sniper', 32, 32);
-  g.clear();
-
-  // neutralized ghost
-  drawCourier(g, 0x2de2e6, 0x0b0d12, false);
-  g.generateTexture('enemy_down', 32, 32);
-  g.clear();
-
-  // --- weapons (pickup + held overlays are distinct shapes) ---
-  drawWeaponFist(g);
-  g.generateTexture('wpn_fist', 32, 32);
-  g.clear();
-  drawWeaponBat(g);
-  g.generateTexture('wpn_bat', 32, 32);
-  g.clear();
-  drawWeaponKnife(g);
-  g.generateTexture('wpn_knife', 32, 32);
-  g.clear();
-  drawWeaponPistol(g);
-  g.generateTexture('wpn_pistol', 32, 32);
-  g.clear();
-  drawWeaponShotgun(g);
-  g.generateTexture('wpn_shotgun', 32, 32);
-  g.clear();
-  drawWeaponUzi(g);
-  g.generateTexture('wpn_uzi', 32, 32);
-  g.clear();
-
-  // bullet
-  g.fillStyle(0xffc857, 1);
-  g.fillCircle(4, 4, 3);
-  g.fillStyle(0xffffff, 0.9);
-  g.fillCircle(4, 4, 1.5);
-  g.generateTexture('bullet', 8, 8);
-  g.clear();
-
-  // muzzle flash
-  g.fillStyle(0xffc857, 1);
-  g.fillTriangle(0, 8, 16, 4, 16, 12);
-  g.fillStyle(0xffffff, 0.9);
-  g.fillTriangle(4, 8, 14, 6, 14, 10);
-  g.generateTexture('muzzle', 16, 16);
-  g.clear();
-
-  // particle pixel
-  g.fillStyle(0xffffff, 1);
-  g.fillRect(0, 0, 4, 4);
-  g.generateTexture('pixel', 4, 4);
-  g.clear();
-
-  // spark
-  g.fillStyle(0x2de2e6, 1);
-  g.fillCircle(4, 4, 4);
-  g.generateTexture('spark', 8, 8);
-  g.destroy();
-}
-
-function drawFloor(g: Phaser.GameObjects.Graphics, base: number, accent: number): void {
-  g.fillStyle(base, 1);
-  g.fillRect(0, 0, 32, 32);
-  g.fillStyle(accent, 0.5);
-  g.fillRect(0, 0, 32, 1);
-  g.fillRect(0, 0, 1, 32);
-  g.fillStyle(0x2de2e6, 0.06);
-  g.fillCircle(24, 8, 3);
-}
-
-function drawCourier(g: Phaser.GameObjects.Graphics, neon: number, dark: number, isPlayer: boolean): void {
-  // body
-  g.fillStyle(dark, 1);
-  g.fillCircle(16, 16, 11);
-  g.lineStyle(2, neon, 1);
-  g.strokeCircle(16, 16, 11);
-  // head direction wedge
-  g.fillStyle(neon, 1);
-  g.fillTriangle(28, 16, 18, 11, 18, 21);
-  // visor
-  g.fillStyle(0xffffff, isPlayer ? 0.85 : 0.5);
-  g.fillCircle(16, 16, 3);
-  if (isPlayer) {
-    g.lineStyle(1, 0x39ff14, 0.8);
-    g.strokeCircle(16, 16, 13);
+export function preloadGameSprites(scene: Phaser.Scene): void {
+  for (const [key, path] of Object.entries(SPRITE_FILES)) {
+    if (!scene.textures.exists(key)) {
+      scene.load.image(key, path);
+    }
   }
 }
 
-function drawWeaponFist(g: Phaser.GameObjects.Graphics): void {
-  g.fillStyle(0xffc857, 1);
-  g.fillCircle(16, 16, 7);
-  g.lineStyle(2, 0xffffff, 0.7);
-  g.strokeCircle(16, 16, 7);
-}
-
-function drawWeaponBat(g: Phaser.GameObjects.Graphics): void {
-  g.lineStyle(5, 0xc49a6c, 1);
-  g.lineBetween(8, 24, 24, 8);
-  g.fillStyle(0xffc857, 1);
-  g.fillCircle(24, 8, 4);
-}
-
-function drawWeaponKnife(g: Phaser.GameObjects.Graphics): void {
-  g.fillStyle(0xc0c8d8, 1);
-  g.fillTriangle(8, 22, 14, 8, 18, 10);
-  g.fillStyle(0x5a4030, 1);
-  g.fillRect(8, 20, 8, 4);
-}
-
-function drawWeaponPistol(g: Phaser.GameObjects.Graphics): void {
-  g.fillStyle(0x9aa3b5, 1);
-  g.fillRoundedRect(8, 12, 18, 7, 2);
-  g.fillStyle(0x5a6478, 1);
-  g.fillRect(10, 18, 5, 8);
-  g.fillStyle(0xffc857, 1);
-  g.fillRect(24, 13, 4, 4);
-}
-
-function drawWeaponShotgun(g: Phaser.GameObjects.Graphics): void {
-  g.fillStyle(0x6b5344, 1);
-  g.fillRoundedRect(4, 13, 24, 6, 2);
-  g.fillStyle(0x3a3030, 1);
-  g.fillRect(6, 18, 6, 8);
-  g.fillStyle(0xff8844, 1);
-  g.fillCircle(26, 16, 3);
-}
-
-function drawWeaponUzi(g: Phaser.GameObjects.Graphics): void {
-  g.fillStyle(0x4a5568, 1);
-  g.fillRoundedRect(6, 11, 20, 8, 2);
-  g.fillStyle(0x2a3142, 1);
-  g.fillRect(10, 18, 4, 8);
-  g.fillRect(16, 19, 8, 3);
-  g.fillStyle(0x2de2e6, 1);
-  g.fillRect(24, 12, 5, 5);
+/** Fallback procedural textures if a PNG failed to load. */
+export function ensureFallbackTextures(scene: Phaser.Scene): void {
+  if (scene.textures.exists('player') && scene.textures.exists('bullet')) return;
+  // Minimal emergency fallbacks
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
+  if (!scene.textures.exists('pixel')) {
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(0, 0, 4, 4);
+    g.generateTexture('pixel', 4, 4);
+    g.clear();
+  }
+  if (!scene.textures.exists('bullet')) {
+    g.fillStyle(0xffc857, 1);
+    g.fillCircle(4, 4, 3);
+    g.generateTexture('bullet', 8, 8);
+    g.clear();
+  }
+  g.destroy();
 }
 
 export const WEAPON_TEXTURE: Record<string, string> = {
@@ -222,3 +68,48 @@ export const ENEMY_TEXTURE: Record<string, string> = {
   shield: 'enemy_shield',
   sniper: 'enemy_sniper',
 };
+
+/**
+ * Cast a ray and return the distance until a wall hit (or maxRange).
+ */
+export function raycastWalls(
+  x: number,
+  y: number,
+  angle: number,
+  maxRange: number,
+  walls: Phaser.Geom.Rectangle[],
+  steps = 28,
+): number {
+  let hitDist = maxRange;
+  for (let i = 1; i <= steps; i++) {
+    const d = (maxRange * i) / steps;
+    const px = x + Math.cos(angle) * d;
+    const py = y + Math.sin(angle) * d;
+    for (const r of walls) {
+      if (r.contains(px, py)) {
+        hitDist = Math.max(0, d - maxRange / steps);
+        return hitDist;
+      }
+    }
+  }
+  return hitDist;
+}
+
+export function segmentHitsWall(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  walls: Phaser.Geom.Rectangle[],
+  steps = 16,
+): boolean {
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const x = x1 + (x2 - x1) * t;
+    const y = y1 + (y2 - y1) * t;
+    for (const r of walls) {
+      if (r.contains(x, y)) return true;
+    }
+  }
+  return false;
+}
