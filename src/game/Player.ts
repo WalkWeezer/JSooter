@@ -54,14 +54,16 @@ export class PlayerActor {
     this.body.setCircle(12, 4, 4);
     this.body.setCollideWorldBounds(true);
     this.body.setDepth(20);
-    this.body.setDisplaySize(40, 40);
+    this.body.setDisplaySize(52, 52);
 
-    this.weaponSprite = scene.add.image(x, y, 'wpn_fist').setDepth(21).setDisplaySize(22, 22);
+    this.weaponSprite = scene.add.image(x, y, 'wpn_fist').setDepth(21).setDisplaySize(20, 20);
+    this.weaponSprite.setVisible(false);
   }
 
   setWeapon(type: WeaponType): void {
     this.weapon = type;
     this.weaponSprite.setTexture(`wpn_${type}`);
+    this.weaponSprite.setVisible(type !== 'fist');
   }
 
   update(moveX: number, moveY: number, aimX: number, aimY: number, delta: number): void {

@@ -57,6 +57,7 @@ async function bootstrap(): Promise<void> {
   });
 
   bindPhaserMute(game);
+  (window as unknown as { __NEONTRON_GAME__?: Phaser.Game }).__NEONTRON_GAME__ = game;
 
   onPlatformPause(() => {
     audioService.setSystemMuted(true);

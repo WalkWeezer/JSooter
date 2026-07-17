@@ -16,7 +16,7 @@ import { getMission } from '../data/missionIndex';
 import { saveService } from '../save/SaveService';
 import { getMask } from '../data/masks';
 import { adsService } from '../ads/AdsService';
-import { WEAPON_TEXTURE, ensureFallbackTextures } from '../game/SpriteFactory';
+import { WEAPON_TEXTURE, ensureFallbackTextures, segmentHitsWall } from '../game/SpriteFactory';
 import { CombatVfx } from '../game/CombatVfx';
 
 type Pickup = {
@@ -83,21 +83,48 @@ export class MissionScene extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, mapW, mapH);
     this.physics.world.setBounds(0, 0, mapW, mapH);
-    this.cameras.main.setBackgroundColor('#0e121a');
+    this.cameras.main.setBackgroundColor('#0B0D12');
+    this.cameras.main.setRoundPixels(true);
+    this.cameras.main.setZoom(1.35);
 
     for (let y = 0; y < m.height; y++) {
       for (let x = 0; x < m.width; x++) {
         const key = (x + y) % 2 === 0 ? 'floor_a' : 'floor_b';
-        this.add.image(x * ts + ts / 2, y * ts + ts / 2, key).setDepth(0);
+        this.add
+          .image(x * ts + ts / 2, y * ts + ts / 2, key)
+          .setDisplaySize(ts, ts)
+          .setDepth(0);
       }
     }
 
     this.walls = this.physics.add.staticGroup();
+    const wallSet = new Set(m.walls.map(([x, y]) => `${x},${y}`));
     for (const [tx, ty] of m.walls) {
       const img = this.walls.create(tx * ts + ts / 2, ty * ts + ts / 2, 'wall') as Phaser.Physics.Arcade.Image;
+      img.setDisplaySize(ts, ts);
+      img.setDepth(12);
       img.refreshBody();
       this.wallRects.push(new Phaser.Geom.Rectangle(tx * ts, ty * ts, ts, ts));
+      // Neon edge accents where wall faces open floor (club look from GDD)
+      const openN = !wallSet.has(`${tx},${ty - 1}`);
+      const openS = !wallSet.has(`${tx},${ty + 1}`);
+      if (openN) {
+        this.add
+          .image(tx * ts + ts / 2, ty * ts + 3, 'neon_strip_m')
+          .setDisplaySize(ts * 0.92, 4)
+          .setDepth(13)
+          .setAlpha(0.85);
+      }
+      if (openS) {
+        this.add
+          .image(tx * ts + ts / 2, ty * ts + ts - 3, 'neon_strip_c')
+          .setDisplaySize(ts * 0.92, 4)
+          .setDepth(13)
+          .setAlpha(0.75);
+      }
     }
+
+    this.placeClubDecor(m, ts, wallSet);
 
     const spawnX = m.playerSpawn[0] * ts + ts / 2;
     const spawnY = m.playerSpawn[1] * ts + ts / 2;
@@ -144,7 +171,7 @@ export class MissionScene extends Phaser.Scene {
 
     const exitX = m.exit[0] * ts + ts / 2;
     const exitY = m.exit[1] * ts + ts / 2;
-    this.add.image(exitX, exitY, 'exit').setDepth(2);
+    this.add.image(exitX, exitY, 'exit').setDisplaySize(ts * 1.15, ts * 1.15).setDepth(2);
     this.exitZone = this.add.zone(exitX, exitY, ts, ts);
     this.physics.world.enable(this.exitZone);
     (this.exitZone.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
@@ -439,17 +466,95 @@ export class MissionScene extends Phaser.Scene {
     }
   }
 
-  private lineBlocked(x1: number, y1: number, x2: number, y2: number): boolean {
-    const steps = 14;
-    for (let i = 1; i < steps; i++) {
-      const tt = i / steps;
-      const x = x1 + (x2 - x1) * tt;
-      const y = y1 + (y2 - y1) * tt;
-      for (const r of this.wallRects) {
-        if (r.contains(x, y)) return true;
+  private placeClubDecor(
+    m: MissionDef,
+    ts: number,
+    wallSet: Set<string>,
+  ): void {
+    const blocked = new Set<string>();
+    blocked.add(`${m.playerSpawn[0]},${m.playerSpawn[1]}`);
+    blocked.add(`${m.exit[0]},${m.exit[1]}`);
+    if (m.caseItem) blocked.add(`${m.caseItem[0]},${m.caseItem[1]}`);
+    for (const e of m.enemies) blocked.add(`${e.x},${e.y}`);
+    for (const w of m.weapons) blocked.add(`${w.x},${w.y}`);
+    for (const [x, y] of m.walls) blocked.add(`${x},${y}`);
+
+    const isOpen = (x: number, y: number) =>
+      x > 0 && y > 0 && x < m.width - 1 && y < m.height - 1 && !blocked.has(`${x},${y}`) && !wallSet.has(`${x},${y}`);
+
+    // Brand neon sign on first long top-wall stretch
+    let signPlaced = false;
+    for (let x = 2; x < m.width - 3 && !signPlaced; x++) {
+      if (wallSet.has(`${x},${1}`) && isOpen(x, 2) && isOpen(x + 1, 2)) {
+        this.add
+          .image(x * ts + ts, 1 * ts + ts * 0.55, 'prop_sign')
+          .setDisplaySize(ts * 3.2, ts * 0.7)
+          .setDepth(4)
+          .setAlpha(0.95);
+        // soft glow under sign
+        const glow = this.add.circle(x * ts + ts, 2 * ts + 4, ts * 1.4, 0xff2a6d, 0.08).setDepth(1);
+        this.tweens.add({ targets: glow, alpha: 0.14, duration: 900, yoyo: true, repeat: -1 });
+        signPlaced = true;
       }
     }
-    return false;
+
+    const propCycle = ['prop_sofa', 'prop_table', 'prop_plant', 'prop_stool'] as const;
+    const candidates: [number, number][] = [];
+    for (let y = 1; y < m.height - 1; y++) {
+      for (let x = 1; x < m.width - 1; x++) {
+        if (!isOpen(x, y)) continue;
+        // prefer near walls for furniture
+        const nearWall =
+          wallSet.has(`${x - 1},${y}`) ||
+          wallSet.has(`${x + 1},${y}`) ||
+          wallSet.has(`${x},${y - 1}`) ||
+          wallSet.has(`${x},${y + 1}`);
+        if (nearWall) candidates.push([x, y]);
+      }
+    }
+
+    // Stable sparse sample
+    let placed = 0;
+    const step = Math.max(2, Math.floor(candidates.length / 8));
+    for (let i = 0; i < candidates.length && placed < 10; i += step) {
+      const [x, y] = candidates[i];
+      const key = `${x},${y}`;
+      if (blocked.has(key)) continue;
+      // keep clear of neighbors already used
+      let close = false;
+      for (const b of blocked) {
+        const [bx, by] = b.split(',').map(Number);
+        if (Math.abs(bx - x) + Math.abs(by - y) < 3) {
+          close = true;
+          break;
+        }
+      }
+      if (close) continue;
+      blocked.add(key);
+      const tex = propCycle[placed % propCycle.length];
+      const scale = tex === 'prop_sofa' ? 1.35 : tex === 'prop_table' ? 0.95 : 0.85;
+      this.add
+        .image(x * ts + ts / 2, y * ts + ts / 2, tex)
+        .setDisplaySize(ts * scale, ts * scale)
+        .setDepth(4)
+        .setAlpha(0.92);
+      placed += 1;
+    }
+
+    // Ambient corner neon washes
+    const washes: Array<[number, number, number]> = [
+      [ts * 2, ts * 2, 0x2de2e6],
+      [m.width * ts - ts * 2, ts * 2, 0xff2a6d],
+      [ts * 2, m.height * ts - ts * 2, 0xff2a6d],
+      [m.width * ts - ts * 2, m.height * ts - ts * 2, 0x2de2e6],
+    ];
+    for (const [x, y, color] of washes) {
+      this.add.circle(x, y, ts * 2.5, color, 0.06).setDepth(1);
+    }
+  }
+
+  private lineBlocked(x1: number, y1: number, x2: number, y2: number): boolean {
+    return segmentHitsWall(x1, y1, x2, y2, this.wallRects, 20);
   }
 
   private onSpotted(): void {

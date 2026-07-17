@@ -38,31 +38,50 @@ export class HubScene extends Phaser.Scene {
     const isMock = Boolean(this.registry.get('isMock'));
     const lang = getLang();
 
-    this.add.rectangle(width / 2, pad / 2, width, pad, 0x11151f, 0.9);
+    if (this.textures.exists('hub_bg')) {
+      this.add
+        .image(width / 2, height / 2, 'hub_bg')
+        .setDisplaySize(width, height)
+        .setAlpha(0.9)
+        .setDepth(0);
+    }
+    this.add.rectangle(width / 2, height / 2, width, height, 0x0b0d12, 0.45).setDepth(1);
+
+    this.add.rectangle(width / 2, pad / 2, width, pad, 0x11151f, 0.9).setDepth(2);
     this.add
       .text(width / 2, pad / 2, t('hub.sticky_label'), {
         fontFamily: 'monospace',
         fontSize: '12px',
         color: '#5a6478',
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(3);
+
+    if (this.textures.exists('prop_sign')) {
+      this.add
+        .image(width / 2, height * 0.18, 'prop_sign')
+        .setDisplaySize(Math.min(420, width * 0.7), 56)
+        .setDepth(3);
+    }
 
     this.add
-      .text(width / 2, height * 0.26, t('hub.title'), {
+      .text(width / 2, height * 0.28, t('hub.title'), {
         fontFamily: 'monospace',
         fontSize: Math.min(48, width * 0.1) + 'px',
         color: '#2DE2E6',
         fontStyle: 'bold',
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(3);
 
     this.add
-      .text(width / 2, height * 0.34, t('hub.subtitle'), {
+      .text(width / 2, height * 0.36, t('hub.subtitle'), {
         fontFamily: 'monospace',
         fontSize: Math.min(22, width * 0.05) + 'px',
         color: '#FF2A6D',
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(3);
 
     this.add
       .text(
@@ -75,7 +94,8 @@ export class HubScene extends Phaser.Scene {
           color: '#9aa3b5',
         },
       )
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(3);
 
     const cta = this.add
       .text(width / 2, height * 0.52, isMock ? t('hub.cta_hum') : t('hub.cta_ready'), {
@@ -86,6 +106,7 @@ export class HubScene extends Phaser.Scene {
         padding: { x: 16, y: 10 },
       })
       .setOrigin(0.5)
+      .setDepth(3)
       .setInteractive({ useHandCursor: true });
 
     cta.on('pointerdown', () => {
@@ -101,6 +122,7 @@ export class HubScene extends Phaser.Scene {
         padding: { x: 14, y: 8 },
       })
       .setOrigin(0.5)
+      .setDepth(3)
       .setInteractive({ useHandCursor: true });
 
     settings.on('pointerdown', () => this.scene.start('SettingsScene'));
@@ -114,6 +136,7 @@ export class HubScene extends Phaser.Scene {
         padding: { x: 14, y: 8 },
       })
       .setOrigin(0.5)
+      .setDepth(3)
       .setInteractive({ useHandCursor: true });
 
     missions.on('pointerdown', () => {
@@ -129,6 +152,7 @@ export class HubScene extends Phaser.Scene {
         padding: { x: 12, y: 7 },
       })
       .setOrigin(0.5)
+      .setDepth(3)
       .setInteractive({ useHandCursor: true });
     shop.on('pointerdown', () => this.scene.start('ShopScene'));
 
@@ -139,8 +163,9 @@ export class HubScene extends Phaser.Scene {
         color: '#6b7385',
         align: 'center',
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(3);
 
-    this.add.rectangle(width / 2, height - pad / 2, width, pad, 0x11151f, 0.55);
+    this.add.rectangle(width / 2, height - pad / 2, width, pad, 0x11151f, 0.55).setDepth(2);
   }
 }

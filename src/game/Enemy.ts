@@ -28,7 +28,7 @@ export class EnemyActor {
     this.body.setCircle(14, 2, 2);
     this.body.setImmovable(true);
     this.body.setDepth(18);
-    this.body.setDisplaySize(36, 36);
+    this.body.setDisplaySize(50, 50);
     this.cone = scene.add.graphics().setDepth(5);
     this.facing = Phaser.Math.DegToRad(def.facing ?? 0);
     this.targetFacing = this.facing;
@@ -122,10 +122,10 @@ export class EnemyActor {
     this.cone.fillStyle(fill, alertHot ? 0.3 : 0.18);
     this.cone.beginPath();
     this.cone.moveTo(this.body.x, this.body.y);
-    const steps = 20;
+    const steps = 28;
     for (let i = 0; i <= steps; i++) {
       const a = this.facing - this.visionFov / 2 + (this.visionFov * i) / steps;
-      const dist = raycastWalls(this.body.x, this.body.y, a, this.visionRange, this.walls, 32);
+      const dist = raycastWalls(this.body.x, this.body.y, a, this.visionRange, this.walls, 48);
       this.cone.lineTo(this.body.x + Math.cos(a) * dist, this.body.y + Math.sin(a) * dist);
     }
     this.cone.closePath();

@@ -23,6 +23,14 @@ export const SPRITE_FILES: Record<string, string> = {
   muzzle: 'assets/sprites/muzzle.png',
   spark: 'assets/sprites/spark.png',
   pixel: 'assets/sprites/pixel.png',
+  prop_plant: 'assets/sprites/prop_plant.png',
+  prop_sofa: 'assets/sprites/prop_sofa.png',
+  prop_table: 'assets/sprites/prop_table.png',
+  prop_stool: 'assets/sprites/prop_stool.png',
+  prop_sign: 'assets/sprites/prop_sign.png',
+  neon_strip_m: 'assets/sprites/neon_strip_m.png',
+  neon_strip_c: 'assets/sprites/neon_strip_c.png',
+  hub_bg: 'assets/sprites/hub_bg.jpg',
 };
 
 export function preloadGameSprites(scene: Phaser.Scene): void {
@@ -80,14 +88,15 @@ export function raycastWalls(
   walls: Phaser.Geom.Rectangle[],
   steps = 28,
 ): number {
+  const n = Math.max(steps, Math.ceil(maxRange / 3));
   let hitDist = maxRange;
-  for (let i = 1; i <= steps; i++) {
-    const d = (maxRange * i) / steps;
+  for (let i = 1; i <= n; i++) {
+    const d = (maxRange * i) / n;
     const px = x + Math.cos(angle) * d;
     const py = y + Math.sin(angle) * d;
     for (const r of walls) {
       if (r.contains(px, py)) {
-        hitDist = Math.max(0, d - maxRange / steps);
+        hitDist = Math.max(0, d - maxRange / n);
         return hitDist;
       }
     }
@@ -103,8 +112,10 @@ export function segmentHitsWall(
   walls: Phaser.Geom.Rectangle[],
   steps = 16,
 ): boolean {
-  for (let i = 1; i <= steps; i++) {
-    const t = i / steps;
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  const n = Math.max(steps, Math.ceil(dist / 4));
+  for (let i = 1; i <= n; i++) {
+    const t = i / n;
     const x = x1 + (x2 - x1) * t;
     const y = y1 + (y2 - y1) * t;
     for (const r of walls) {

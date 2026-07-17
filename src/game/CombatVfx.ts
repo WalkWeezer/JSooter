@@ -33,18 +33,18 @@ export class CombatVfx {
     this.rangeGfx.fillStyle(color, alpha);
     this.rangeGfx.beginPath();
     this.rangeGfx.moveTo(x, y);
-    const steps = 14;
+    const steps = 18;
+    const raySteps = Math.max(20, Math.ceil(range / 3));
     for (let i = 0; i <= steps; i++) {
       const a = facing - fov + ((fov * 2) * i) / steps;
       let dist = range;
       if (walls?.length) {
-        // lazy import-free local ray
-        for (let s = 1; s <= 24; s++) {
-          const d = (range * s) / 24;
+        for (let s = 1; s <= raySteps; s++) {
+          const d = (range * s) / raySteps;
           const px = x + Math.cos(a) * d;
           const py = y + Math.sin(a) * d;
           if (walls.some((r) => r.contains(px, py))) {
-            dist = Math.max(0, d - range / 24);
+            dist = Math.max(0, d - range / raySteps);
             break;
           }
         }
@@ -132,7 +132,7 @@ export class CombatVfx {
       const startY = bullet.y;
 
       const timer = this.scene.time.addEvent({
-        delay: 16,
+        delay: 12,
         loop: true,
         callback: () => {
           if (!alive || !bullet.active) {
@@ -140,10 +140,9 @@ export class CombatVfx {
             return;
           }
           const dist = Phaser.Math.Distance.Between(startX, startY, bullet.x, bullet.y);
-          // point-sample current bullet cell against walls (prev→curr segment)
-          const hitWall =
-            blocked(bullet.x - Math.cos(ang) * 8, bullet.y - Math.sin(ang) * 8, bullet.x, bullet.y) ||
-            blocked(startX, startY, bullet.x, bullet.y);
+          const prevX = bullet.x - Math.cos(ang) * 12;
+          const prevY = bullet.y - Math.sin(ang) * 12;
+          const hitWall = blocked(prevX, prevY, bullet.x, bullet.y);
           if (dist > maxDist || hitWall) {
             alive = false;
             this.hitSpark(bullet.x, bullet.y);
